@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="okestro.assignment.repository.TodoMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="tno">
+        insert into todo(title, writer, due_date)
+        values (#{title}, #{writer}, #{dueDate})
+    </insert>
+
+    <select id="findByTno" resultType="Todo">
+        select *
+        from todo
+        where tno = #{tno}
+    </select>
+
+    <update id="update">
+        update todo
+        set title=#{todoDTO.title},
+            complete=#{todoDTO.complete},
+            due_date=#{todoDTO.dueDate}
+        where tno = #{tno}
+    </update>
+
+    <delete id="deleteByTno">
+        delete
+        from todo
+        where tno = #{tno}
+    </delete>
+
+    <select id="findTodoList" resultType="Todo">
+        select *
+        from todo
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        select count(tno)
+        from todo
+    </select>
+
+</mapper>
