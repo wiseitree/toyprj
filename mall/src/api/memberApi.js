@@ -22,7 +22,8 @@ export const postRegister = async (registerParam) => {
 };
 
 export const checkDuplicate = async (currentData) => {
-  const header = { headers: { CurrentData: currentData } };
+  const encodedCurrentData = encodeURIComponent(currentData);
+  const header = { headers: { CurrentData: encodedCurrentData } };
   const res = await axios.get(`${host}/check`, header);
 
   return res.data;
