@@ -31,7 +31,7 @@ public class BoardController {
         return boardService.getBoardDtl(bno);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping("/list")
     public PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO, BoardSearchDTO boardSearchDTO) {
         log.info("#################### BoardController - /api/board/list");

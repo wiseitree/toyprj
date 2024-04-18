@@ -101,8 +101,8 @@ class BoardServiceTest {
     @Test
     public void remove(){
         //given
-        Long bno = 137L;
-        String currentEmail = "user1@aaa.com";
+        Long bno = 53L;
+        String currentEmail = "admin@aaa.com";
 
         //when
         boardService.remove(bno, currentEmail);

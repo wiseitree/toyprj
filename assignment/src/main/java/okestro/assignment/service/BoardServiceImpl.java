@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
 import okestro.assignment.domain.Member;
+import okestro.assignment.domain.MemberRole;
 import okestro.assignment.dto.BoardDTO;
 import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.dto.page.PageRequestDTO;
@@ -25,7 +26,7 @@ import java.util.Optional;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class BoardServiceImpl implements BoardService{
+public class BoardServiceImpl implements BoardService {
 
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
@@ -53,7 +54,7 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public void modify(Long bno, BoardDTO boardDTO, String currentEmail) {
-        if (!isSameMember(bno, currentEmail)){
+        if (!isSameMember(bno, currentEmail)) {
             throw new CustomNotSameMemberException("해당 작업을 수행할 수 있는 회원이 아닙니다.");
         }
 
@@ -66,7 +67,12 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public void remove(Long bno, String currentEmail) {
-        if (!isSameMember(bno, currentEmail)){
+        if (isAdmin(currentEmail)){
+            boardRepository.deleteByBno(bno);
+            return;
+        }
+
+        if (!isSameMember(bno, currentEmail)) {
             throw new CustomNotSameMemberException("해당 작업을 수행할 수 있는 회원이 아닙니다.");
         }
 
@@ -84,7 +90,6 @@ public class BoardServiceImpl implements BoardService{
         limit = pageRequestDTO.getSize();
         totalCount = boardRepository.getTotalCount(boardSearchDTO);
         log.info("#################### BoardServiceImpl - totalCount = {}", totalCount);
-
 
 
         List<Board> boardList = boardRepository.findBoardList(offset, limit, boardSearchDTO);
@@ -105,13 +110,29 @@ public class BoardServiceImpl implements BoardService{
 
 
     private boolean isSameMember(Long bno, String currentEmail) {
-        Board board = boardRepository.findByBno(bno).orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시판입니다."));
+        Board board = boardRepository.findByBno(bno)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시판입니다."));
 
         if (!board.getMember().getEmail().equals(currentEmail))
             return false;
 
         return true;
 
+    }
+
+    private boolean isAdmin(String currentEmail) {
+        boolean admin = false;
+
+        Member member = memberRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+
+        List<MemberRole> memberRoleList = member.getMemberRoleList();
+        for (MemberRole memberRole : memberRoleList) {
+            if (memberRole == MemberRole.ADMIN)
+                admin = true;
+        }
+
+        return admin;
     }
 
 

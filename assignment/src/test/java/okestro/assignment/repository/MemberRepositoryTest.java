@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -51,17 +52,31 @@ class MemberRepositoryTest {
     @Test()
     public void read(){
         //given
-        String email = "user9@aaa.com";
+        String email = "admin@aaa.com";
 
         //when
         Optional<Member> result = memberRepository.findByEmail(email);
         Member member = result.get();
+        MemberRole memberRole = member.getMemberRoleList().get(0);
+        log.info("memberRole: {}", memberRole);
 
+        List<MemberRole> memberRoleList = member.getMemberRoleList();
+        for (MemberRole role : memberRoleList) {
+            if (role == MemberRole.ADMIN) {
+                log.info("role: {}", role);
+                log.info("######################## {} ", role + "############ a s d z x c #########");
+            }
+        }
+
+        if (memberRole == MemberRole.ADMIN){
+            log.info("####################### memberRole: {}", member.getMemberRoleList().get(0));
+        }
         log.info("member = {}", member);
         log.info("memberRoleSize = {} ", member.getMemberRoleList().size());
 
+
         //then
-        assertThat(member.getMemberRoleList().size()).isEqualTo(3);
+        assertThat(member.getMemberRoleList().size()).isEqualTo(1);
 
     }
 

@@ -122,9 +122,6 @@ const ListComponent = () => {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      console.log(
-        'handleKeyDownhandleKeyDownhandleKeyDownhandleKeyDownhandleKeyDown',
-      );
       moveToList({ page: 1, size: 10 }, searchParam);
     }
   };
