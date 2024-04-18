@@ -115,7 +115,7 @@ const AddComponent = () => {
         {/*<div className="relative mb-4 flex p-4 flex-wrap items-stretch">*/}
         <button
           type="button"
-          className="rounded p-4 mr-2 w-36 bg-blue-500 text-xl  text-white hover:bg-blue-800"
+          className="rounded p-4 mr-2 w-36 bg-gray-400 text-xl  text-white hover:bg-gray-500"
           onClick={() => moveToList()}
         >
           취소
