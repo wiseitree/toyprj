@@ -3,6 +3,7 @@ package okestro.assignment.service;
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
 import okestro.assignment.dto.BoardDTO;
+import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.dto.page.PageRequestDTO;
 import okestro.assignment.dto.page.PageResponseDTO;
 import okestro.assignment.repository.BoardRepository;
@@ -118,8 +119,14 @@ class BoardServiceTest {
         PageRequestDTO pageRequestDTO = new PageRequestDTO();
         pageRequestDTO.setPage(3);
 
+        BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()
+                .title("title")
+                .content("content")
+                .keyword("content")
+                .build();
+
         //when
-        PageResponseDTO<BoardDTO> pageResponse = boardService.getPageResponse(pageRequestDTO);
+        PageResponseDTO<BoardDTO> pageResponse = boardService.getPageResponse(pageRequestDTO, boardSearchDTO);
 
         //then
         log.info("############################## getPageResponse ##############################");

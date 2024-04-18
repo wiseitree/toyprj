@@ -52,15 +52,32 @@
     </delete>
 
     <select id="findBoardList" resultMap="boardMap">
-        select b.bno, b.title, b.content, b.email,  b.writer, b.reg_time, b.update_time, m.nickname
+        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname
         from board b
         left join member m on b.email = m.email
+        <where>
+            <if test="boardSearchDTO.title != null and boardSearchDTO.title != ''">
+                or b.title like concat('%', #{boardSearchDTO.keyword}, '%')
+            </if>
+            <if test="boardSearchDTO.content != null and boardSearchDTO.content != ''">
+                or b.content like concat('%', #{boardSearchDTO.keyword}, '%')
+            </if>
+        </where>
+        order by b.reg_time desc , b.bno desc
         limit #{offset}, #{limit}
     </select>
 
     <select id="getTotalCount" resultType="int">
-        select count(bno)
+        select count(*)
         from board
+        <where>
+            <if test="title != null and title != ''">
+                or title like concat('%', #{keyword}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                or content like concat('%', #{keyword}, '%')
+            </if>
+        </where>
     </select>
 
 

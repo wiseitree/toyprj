@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import PageComponent from '../common/PageComponent';
 import useCustomLogin from '../../hooks/useCustomLogin';
 import { getList } from '../../api/boardApi';
+import { useSearchParams } from 'react-router-dom';
 
 const initState = {
   dtoList: [],
@@ -17,20 +18,116 @@ const initState = {
   current: 0,
 };
 
+const searchState = {
+  title: '',
+  content: '',
+  keyword: '',
+};
+
 const ListComponent = () => {
+  console.log('##### ListComponent start #####');
   const { exceptionHandle } = useCustomLogin();
-  const { page, size, refresh, moveToList, moveToRead } = useCustomMove();
+  const {
+    page,
+    size,
+    title,
+    content,
+    keyword,
+    refresh,
+    moveToList,
+    moveToRead,
+  } = useCustomMove();
   //serverData는 나중에 사용
   const [serverData, setServerData] = useState(initState);
+  const [searchParam, setSearchParam] = useState(searchState);
+  console.log('currentSearchParam.title - ' + searchParam.title);
+  console.log('currentSearchParam.content - ' + searchParam.content);
+  console.log('currentSearchParam.keyword - ' + searchParam.keyword);
+  console.log('current-title = ' + title);
+  console.log('current-content = ' + content);
+  console.log('current-keyword = ' + keyword);
+  console.log('##### ListComponent end #####');
 
   useEffect(() => {
-    getList({ page, size })
+    getList({ page, size }, { title, content, keyword })
       .then((data) => {
-        console.log(data);
+        console.log(
+          '                                                  useEffect - getList - searchParam.title - ' +
+            searchParam.title,
+        );
+        console.log(
+          '                                                  useEffect - getList - searchParam.content - ' +
+            searchParam.content,
+        );
         setServerData(data);
       })
       .catch((err) => exceptionHandle(err));
-  }, [page, size, refresh]);
+  }, [page, size, title, content, keyword, refresh]);
+
+  useEffect(() => {
+    searchParam.title = title;
+    searchParam.content = content;
+    searchParam.keyword = keyword;
+
+    if (searchParam.title === '' && searchParam.content === '') {
+      searchParam.title = 'title';
+      searchParam.content = 'content';
+      // setSearchParam({ ...searchParam, title: 'title', content: 'content' }); <-- 얘는 위에 두줄 주석처리하면 써도 됌
+      console.log(
+        "##### if searchParam.title == '' && searchParam.content == ''",
+      );
+    }
+
+    // setSearchParam({ ...searchParam, title, content, keyword }); <-- 여기서 이렇게 쓰면 안돼고
+    // setSearchParam({ ...searchParam, title: 'title', content: 'content' }); <-- 얘도 이렇게 쓰면 안돼고
+  }, [title, content, keyword]);
+
+  const handleSearchOptionChange = (e) => {
+    searchParam.title = '';
+    searchParam.content = '';
+
+    if (e.target.value === 'title') searchParam.title = 'title';
+
+    if (e.target.value === 'content') searchParam.content = 'content';
+
+    if (e.target.value === 'titleAndContent') {
+      searchParam.title = 'title';
+      searchParam.content = 'content';
+    }
+
+    setSearchParam({ ...searchParam });
+  };
+
+  const handleSearchKeywordChange = (e) => {
+    searchParam.keyword = e.target.value;
+    console.log('handleSearchKeywordChange - searchParam', searchParam);
+    setSearchParam({ ...searchParam });
+  };
+
+  const searchParamOption = () => {
+    let option = 'titleAndContent';
+    if (searchParam.title === 'title') option = 'title';
+
+    if (searchParam.content === 'content') option = 'content';
+
+    if (searchParam.title === 'title' && searchParam.content === 'content')
+      option = 'titleAndContent';
+
+    return option;
+  };
+
+  const searchParamKeyword = () => {
+    return searchParam.keyword;
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      console.log(
+        'handleKeyDownhandleKeyDownhandleKeyDownhandleKeyDownhandleKeyDown',
+      );
+      moveToList({ page: 1, size: 10 }, searchParam);
+    }
+  };
 
   return (
     <div className="border-2 border-blue-100 mt-10 mr-2 ml-2">
@@ -65,8 +162,38 @@ const ListComponent = () => {
         ))}
       </div>
 
+      <div className="flex mx-auto justify-center p-6">
+        <div className="w-full flex justify-center">
+          <select
+            className="border border-gray-300 rounded-md p-1 hover:underline"
+            onChange={handleSearchOptionChange}
+            value={searchParamOption()}
+          >
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+            <option value="titleAndContent">제목+내용</option>
+          </select>
+          <input
+            className="border border-gray-300 rounded-md p-1 ml-2"
+            type="text"
+            placeholder="검색어를 입력하세요"
+            value={searchParamKeyword()}
+            onChange={handleSearchKeywordChange}
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            className="bg-blue-500 text-white p-1 ml-2 rounded-md hover:bg-blue-600"
+            onClick={() => moveToList({ page: 1, size: 10 }, searchParam)}
+          >
+            검색
+          </button>
+        </div>
+      </div>
+
       <PageComponent
         serverData={serverData}
+        // searchOption={searchOption}
+        // searchKeyword={searchKeyword}
         movePage={moveToList}
       ></PageComponent>
     </div>

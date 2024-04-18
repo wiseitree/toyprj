@@ -52,7 +52,7 @@ public class MemberServiceImpl implements MemberService{
                 .nickname(memberFormDTO.getNickname())
                 .build();
 
-        member.addRole(MemberRole.USER);
+        member.addRole(MemberRole.ADMIN);
 
         return member;
     }

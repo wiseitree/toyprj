@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
 import okestro.assignment.dto.BoardDTO;
+import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.dto.page.PageRequestDTO;
 import okestro.assignment.dto.page.PageResponseDTO;
 import okestro.assignment.repository.BoardRepository;
@@ -32,8 +33,11 @@ public class BoardController {
 
     @PreAuthorize("hasAnyRole('ROLE_USER')")
     @GetMapping("/list")
-    public PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO) {
-        PageResponseDTO<BoardDTO> pageResponseDTO = boardService.getPageResponse(pageRequestDTO);
+    public PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO, BoardSearchDTO boardSearchDTO) {
+        log.info("#################### BoardController - /api/board/list");
+        log.info("pageRequestDTO: {}", pageRequestDTO);
+        log.info("boardSearchDTO: {}", boardSearchDTO);
+        PageResponseDTO<BoardDTO> pageResponseDTO = boardService.getPageResponse(pageRequestDTO, boardSearchDTO);
         return pageResponseDTO;
     }
 

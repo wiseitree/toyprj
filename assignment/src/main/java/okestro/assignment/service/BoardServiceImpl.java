@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
 import okestro.assignment.domain.Member;
 import okestro.assignment.dto.BoardDTO;
+import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.dto.page.PageRequestDTO;
 import okestro.assignment.dto.page.PageResponseDTO;
 import okestro.assignment.exception.CustomNotSameMemberException;
@@ -74,16 +75,19 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public PageResponseDTO<BoardDTO> getPageResponse(PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<BoardDTO> getPageResponse(PageRequestDTO pageRequestDTO, BoardSearchDTO boardSearchDTO) {
         int offset = 0;
         int limit = 0;
         int totalCount = 0;
 
         offset = (pageRequestDTO.getPage() - 1) * pageRequestDTO.getSize();
         limit = pageRequestDTO.getSize();
-        totalCount = boardRepository.getTotalCount();
+        totalCount = boardRepository.getTotalCount(boardSearchDTO);
+        log.info("#################### BoardServiceImpl - totalCount = {}", totalCount);
 
-        List<Board> boardList = boardRepository.findBoardList(offset, limit);
+
+
+        List<Board> boardList = boardRepository.findBoardList(offset, limit, boardSearchDTO);
         List<BoardDTO> boardDTOList = new ArrayList<>();
         for (Board board : boardList) {
             BoardDTO boardDTO = board.toDTO(board);

@@ -111,16 +111,23 @@ const AddComponent = () => {
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <div className="relative mb-4 flex p-4 flex-wrap items-stretch">
-          <button
-            type="button"
-            className="rounded p-4 w-36 bg-blue-500 text-xl  text-white hover:bg-blue-800"
-            onClick={handleClickAdd}
-          >
-            등록
-          </button>
-        </div>
+      <div className="flex justify-end p-4">
+        {/*<div className="relative mb-4 flex p-4 flex-wrap items-stretch">*/}
+        <button
+          type="button"
+          className="rounded p-4 mr-2 w-36 bg-blue-500 text-xl  text-white hover:bg-blue-800"
+          onClick={() => moveToList()}
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          className="rounded p-4  w-36 bg-blue-500 text-xl  text-white hover:bg-blue-800"
+          onClick={handleClickAdd}
+        >
+          등록
+        </button>
+        {/*</div>*/}
       </div>
     </div>
   );
