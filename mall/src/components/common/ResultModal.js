@@ -9,6 +9,8 @@ const ResultModal = ({ title, content, handleModal }) => {
     handleClickCancel,
     handleClickDelete,
     handleClickModify,
+    handleClickAdd,
+    handleClickAddCancel,
   } = handleModal;
 
   console.log('handleClickCancel = ', handleClickCancel);
@@ -18,6 +20,10 @@ const ResultModal = ({ title, content, handleModal }) => {
     if (title === '삭제') handleClickDelete(bno, currentMemberEmail);
 
     if (title === '수정') handleClickModify(board, currentMemberEmail);
+
+    if (title === '등록') handleClickAdd(board);
+
+    if (title === '작성 취소') handleClickAddCancel();
   };
 
   return (
