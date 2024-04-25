@@ -33,6 +33,14 @@ public class BoardRepository {
         boardMapper.deleteByBno(bno);
     }
 
+    public void saveBoardImage(Board board){
+        boardMapper.saveBoardImage(board);
+    }
+
+    public void deleteBoardImage(Long bno){
+        boardMapper.deleteBoardImage(bno);
+    }
+
     public List<Board> findBoardList(int offset, int limit, BoardSearchDTO boardSearchDTO){
         return boardMapper.findBoardList(offset, limit, boardSearchDTO);
     }

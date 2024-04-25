@@ -14,11 +14,15 @@ public interface BoardMapper {
 
     void save(Board board);
 
+    void saveBoardImage(Board board);
+
     Optional<Board> findByBno(Long bno);
 
     void update(@Param("bno") Long bno, @Param("boardDTO") BoardDTO boardDTO);
 
     void deleteByBno(Long bno);
+
+    void deleteBoardImage(Long bno);
 
     List<Board> findBoardList(@Param("offset") int offset, @Param("limit") int limit, @Param("boardSearchDTO")
     BoardSearchDTO boardSearchDTO);
