@@ -55,6 +55,7 @@ const ListComponent = () => {
     getList({ page, size }, { title, content, keyword })
       .then((data) => {
         setServerData(data);
+        console.log("current serverdata = ", data);
         setFetching(false);
       })
       .catch((err) => exceptionHandle(err));
@@ -142,8 +143,16 @@ const ListComponent = () => {
               <div className="font-extrabold text-1xl p-2 w-1/12">
                 {board.bno}
               </div>
-              <div className="text-2xl m-1 p-2 w-6/12 font-extrabold">
-                {board.title}
+              <div className="flex items-center text-2xl m-1 p-2 w-6/12 font-extrabold">
+                {board.title} {board.uploadFileNames.length > 0 ?
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" className="w-6 h-6 ml-2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/>
+                    </svg>
+                    :
+                    <></>
+                    }
               </div>
               <div className="text-1xl m-1 p-2 w-2/12 font-medium">
                 {board.writer}

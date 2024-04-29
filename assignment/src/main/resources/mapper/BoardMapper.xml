@@ -74,7 +74,7 @@
         select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname, bi.file_name, bi.ord
         from board b
         left join member m on b.email = m.email
-        left join board_image bi on b.bno = bi.board_bno
+        left join board_image bi on b.bno = bi.board_bno and bi.ord = 0
         <where>
             <if test="boardSearchDTO.title != null and boardSearchDTO.title != ''">
                 or b.title like concat('%', #{boardSearchDTO.keyword}, '%')

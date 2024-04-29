@@ -39,8 +39,8 @@ class BoardRepositoryTest {
         for (int i = 1; i <= 135; i++) {
             Member member = memberRepository.findByEmail(email).get();
             Board board = Board.builder()
-                    .title("user1 title")
-                    .content("user1 content")
+                    .title("user1 title test")
+                    .content("user1 content test")
                     .member(member)
                     .build();
 

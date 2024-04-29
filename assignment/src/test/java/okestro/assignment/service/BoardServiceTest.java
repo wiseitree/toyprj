@@ -141,7 +141,7 @@ class BoardServiceTest {
         BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()
                 .title("title")
                 .content("content")
-                .keyword("test")
+                .keyword("content")
                 .build();
 
         //when
