@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import useCustomMove from '../../hooks/useCustomMove';
 import ResultModal from '../common/ResultModal';
 import useCustomLogin from '../../hooks/useCustomLogin';
 import { deleteOne, getOne, putOne } from '../../api/boardApi';
 import { useSelector } from 'react-redux';
+import FetchingModal from "../common/FetchingModal";
 
 const initState = {
   bno: 0,
   title: '',
   content: '',
   email: '',
+  uploadFileNames:[],
 };
 
 const modalState = {
@@ -24,9 +26,13 @@ const ModifyComponent = ({ bno }) => {
   const [board, setBoard] = useState({ ...initState });
   const [boardOwnerEmail, setBoardOwnerEmail] = useState('');
   const [modal, setModal] = useState({ ...modalState });
-
-  console.log('currentMemberEmail = ' + currentMemberEmail);
-  console.log('boardOwnerEmail = ' + boardOwnerEmail);
+  const [fetching, setFetching] = useState(false);
+  const uploadRef = useRef();
+  const [showFileList, setShowFileList] = useState(false);
+  const fileListRef = useRef(null);
+  const fileCountRef = useRef(null);
+  const [hoveredIndex, setHoveredIndex] = useState('');
+  console.log("current board.uploadFileNames", board.uploadFileNames);
 
   const isModifiable = () => {
     let modifiable = false;
@@ -58,30 +64,56 @@ const ModifyComponent = ({ bno }) => {
   }, [boardOwnerEmail]);
 
   useEffect(() => {
+    setFetching(true)
     console.log('useEffect - getOne before');
     getOne(bno)
       .then((data) => {
         setBoard(data);
         setBoardOwnerEmail(data.email);
+        setFetching(false)
         console.log('useEffect - getOne - setBoardOwnerEmail');
       })
       .catch((err) => exceptionHandle(err));
   }, [bno]);
+
+  useEffect(() => {
+    // Add event listener to detect clicks outside file list area
+    const handleClickOutside = (event) => {
+      if (fileListRef.current && !fileListRef.current.contains(event.target) && !fileCountRef.current.contains(event.target)) {
+        setShowFileList(false);
+      }
+    };
+
+    // Attach event listener
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleClickCancel = (bno) => {
     moveToRead(bno);
   };
 
   const handleClickModify = (board, currentMemberEmail) => {
-    putOne(board, currentMemberEmail)
-      .then((data) => {
-        console.log('modify result: ' + data);
-        // const msg = data.result;
-        // if (msg === 'fail') {
-        //   alert('다른 사람의 게시글을 수정할 수 없습니다.');
-        //   moveToRead(bno);
-        // }
+    const files = uploadRef.current.files;
+    const formData = new FormData();
 
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+    }
+
+    formData.append("title", board.title);
+    formData.append("content", board.content);
+    formData.append("uploadFileNames", board.uploadFileNames);
+
+    setFetching(true);
+
+    putOne(board.bno, formData, currentMemberEmail)
+      .then((data) => {
+        setFetching(false);
         closeModal('modified', board.bno);
       })
       .catch((err) => {
@@ -100,6 +132,18 @@ const ModifyComponent = ({ bno }) => {
       // }
       closeModal('deleted');
     });
+  };
+
+  const getOrgFileName = (fileName) => {
+    return fileName.substring(37);
+  }
+
+  const handleDeleteFile = (fileToBeDeleted) => {
+    const resultFileNames = board.uploadFileNames.filter(uploadFileName =>
+        uploadFileName !== fileToBeDeleted
+    );
+    board.uploadFileNames = resultFileNames;
+    setBoard({...board});
   };
 
   const initModal = (modifyType) => {
@@ -153,92 +197,142 @@ const ModifyComponent = ({ bno }) => {
   };
 
   return (
-    <div className="border-2 border-sky-200 mt-10 m-2 p-4">
-      {result ? (
-        <ResultModal
-          title={modal.title}
-          content={modal.content}
-          handleModal={handleModal}
-        ></ResultModal>
-      ) : (
-        <></>
-      )}
+      <div className="border-2 border-sky-200 mt-10 m-2 p-4">
+        {fetching ? <FetchingModal/> : <></>}
 
-      <div className="flex justify-end p-4">
-        <button
-          type="button"
-          className="rounded p-4 m-2 text-xl w-32 text-white bg-gray-400 hover:bg-gray-500"
-          onClick={() => handleClickCancel(bno)}
-          hidden={!isModifiable()}
-        >
-          취소
-        </button>
-        <button
-          type="button"
-          className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
-          onClick={() => initModal('delete')}
-          hidden={!isModifiable()}
-        >
-          삭제
-        </button>
-        <button
-          type="button"
-          className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
-          onClick={() => initModal('modify')}
-          hidden={!isModifiable()}
-        >
-          수정
-        </button>
-      </div>
+        {result ? (
+            <ResultModal
+                title={modal.title}
+                content={modal.content}
+                handleModal={handleModal}
+            ></ResultModal>
+        ) : (
+            <></>
+        )}
 
-      {/*<div className="flex justify-center mt-10">*/}
-      {/*  <div className="relative mb-4 flex w-full flex-wrap items-stretch">*/}
-      {/*    <div className="w-1/5 p-6 text-right font-bold">번호</div>*/}
-      {/*    <div className="w-4/5 p-6 rounded-r border border-solid shadow-md bg-gray-100">*/}
-      {/*      {board.bno}*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*</div>*/}
+        <div className="flex justify-end p-4">
+          <button
+              type="button"
+              className="rounded p-4 m-2 text-xl w-32 text-white bg-gray-400 hover:bg-gray-500"
+              onClick={() => handleClickCancel(bno)}
+              hidden={!isModifiable()}
+          >
+            취소
+          </button>
+          <button
+              type="button"
+              className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
+              onClick={() => initModal('delete')}
+              hidden={!isModifiable()}
+          >
+            삭제
+          </button>
+          <button
+              type="button"
+              className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
+              onClick={() => initModal('modify')}
+              hidden={!isModifiable()}
+          >
+            수정
+          </button>
+        </div>
 
-      <div className="flex justify-end p-4">
-        <div className="mr-4">글번호: {board.bno} </div>
-        <div className="mr-4">작성자: {board.writer} </div>
-        <div>등록시간: {board.regTime}</div>
-      </div>
+        {/*<div className="flex justify-center mt-10">*/}
+        {/*  <div className="relative mb-4 flex w-full flex-wrap items-stretch">*/}
+        {/*    <div className="w-1/5 p-6 text-right font-bold">번호</div>*/}
+        {/*    <div className="w-4/5 p-6 rounded-r border border-solid shadow-md bg-gray-100">*/}
+        {/*      {board.bno}*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
 
-      <div className="flex justify-center">
-        <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-          <div className="w-1/5 p-6 text-right font-bold">제목</div>
-          <input
-            className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
-            name="title"
-            type={'text'}
-            value={board.title}
-            onChange={handleChangeBoard}
-          ></input>
-          <div className="absolute bottom-0 right-0 text-gray-500">
-            {calcContentLen('title')}
+        <div className="flex justify-end p-4">
+          <div className="mr-4">글번호: {board.bno} </div>
+          <div className="mr-4">작성자: {board.writer} </div>
+          <div>등록시간: {board.regTime}</div>
+        </div>
+
+        <div className="flex relative justify-end">
+          <div className="flex justify-end pb-4" ref={fileCountRef}>
+            첨부파일
+            <span className="text-red-600 hover:cursor-pointer"
+                  onClick={() => setShowFileList(!showFileList)}
+            >
+                        ({board.uploadFileNames.length})
+                    </span>
+          </div>
+
+          <div ref={fileListRef} className={`flex absolute ${!showFileList ? 'hidden' : ''} top-full overflow-y-auto z-10
+                bg-white border-2 border-neutral-300`}>
+            <ul>
+              {board.uploadFileNames.map((fileName, index) => (
+                  <div key={index} className="flex items-center"
+                       onMouseEnter={() => setHoveredIndex(index)}
+                       onMouseLeave={() => setHoveredIndex('')}
+                  >
+                    <li className='hover:underline cursor-pointer'>{getOrgFileName(fileName)}</li>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor"
+                        className={`w-6 h-6 cursor-pointer hover:text-red-600 ${hoveredIndex === index ? '' : 'hidden'}`}
+                        onClick={() => handleDeleteFile(fileName)}
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                    </svg>
+                  </div>
+              ))}
+            </ul>
+          </div>
+
+        </div>
+
+
+        <div className="flex justify-center">
+          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+            <div className="w-1/5 p-6 text-right font-bold">Files</div>
+            <input ref={uploadRef}
+                   className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+                   type={'file'} multiple={true}
+            >
+            </input>
+          </div>
+        </div>
+
+
+        <div className="flex justify-center">
+          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+            <div className="w-1/5 p-6 text-right font-bold">제목</div>
+            <input
+                className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+                name="title"
+                type={'text'}
+                value={board.title}
+                onChange={handleChangeBoard}
+            ></input>
+            <div className="absolute bottom-0 right-0 text-gray-500">
+              {calcContentLen('title')}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+            <div className="w-1/5 p-6 text-right font-bold">내용</div>
+            <textarea
+                className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+                name="content"
+                type={'text'}
+                value={board.content}
+                onChange={handleChangeBoard}
+                rows="14"
+            ></textarea>
+            <div className="absolute bottom-0 right-0 text-gray-500">
+              {calcContentLen('content')}
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="flex justify-center">
-        <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-          <div className="w-1/5 p-6 text-right font-bold">내용</div>
-          <textarea
-            className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
-            name="content"
-            type={'text'}
-            value={board.content}
-            onChange={handleChangeBoard}
-            rows="14"
-          ></textarea>
-          <div className="absolute bottom-0 right-0 text-gray-500">
-            {calcContentLen('content')}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 };
 

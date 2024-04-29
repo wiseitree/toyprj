@@ -76,15 +76,17 @@ public class BoardServiceImpl implements BoardService {
         List<String> uploadFileNames = boardDTO.getUploadFileNames();
         Board board = boardRepository.findByBno(boardDTO.getBno()).get();
 
+        board.clearList();
+        boardRepository.deleteBoardImage(bno);
+
         if (uploadFileNames != null && uploadFileNames.size() > 0){
-            board.clearList();
-            boardRepository.deleteBoardImage(bno);
 
             uploadFileNames.stream().forEach(uploadFileName -> {
                 board.addImageString(uploadFileName);
             });
             boardRepository.saveBoardImage(board);
         }
+
     }
 
     @Override

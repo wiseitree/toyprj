@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import PageComponent from '../common/PageComponent';
 import useCustomLogin from '../../hooks/useCustomLogin';
 import { getList } from '../../api/boardApi';
-import { useSearchParams } from 'react-router-dom';
+import FetchingModal from "../common/FetchingModal";
 
 const initState = {
   dtoList: [],
@@ -40,6 +40,8 @@ const ListComponent = () => {
   //serverData는 나중에 사용
   const [serverData, setServerData] = useState(initState);
   const [searchParam, setSearchParam] = useState(searchState);
+  const [fetching, setFetching] = useState(false);
+
   console.log('currentSearchParam.title - ' + searchParam.title);
   console.log('currentSearchParam.content - ' + searchParam.content);
   console.log('currentSearchParam.keyword - ' + searchParam.keyword);
@@ -49,17 +51,11 @@ const ListComponent = () => {
   console.log('##### ListComponent end #####');
 
   useEffect(() => {
+    setFetching(true);
     getList({ page, size }, { title, content, keyword })
       .then((data) => {
-        console.log(
-          '                                                  useEffect - getList - searchParam.title - ' +
-            searchParam.title,
-        );
-        console.log(
-          '                                                  useEffect - getList - searchParam.content - ' +
-            searchParam.content,
-        );
         setServerData(data);
+        setFetching(false);
       })
       .catch((err) => exceptionHandle(err));
   }, [page, size, title, content, keyword, refresh]);
@@ -128,6 +124,7 @@ const ListComponent = () => {
 
   return (
     <div className="border-2 border-blue-100 mt-10 mr-2 ml-2">
+      {fetching ? <FetchingModal/> : <></>}
       <div className="flex mx-auto justify-center p-6 font-extrabold text-2xl">
         <div className="w-1/12">번호</div>
         <div className="w-6/12">제목</div>
