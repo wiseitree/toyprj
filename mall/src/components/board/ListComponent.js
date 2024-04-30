@@ -52,13 +52,16 @@ const ListComponent = () => {
 
   useEffect(() => {
     setFetching(true);
-    getList({ page, size }, { title, content, keyword })
-      .then((data) => {
-        setServerData(data);
-        console.log("current serverdata = ", data);
-        setFetching(false);
-      })
-      .catch((err) => exceptionHandle(err));
+    console.log("#################################### useEffect before getList ####################################");
+    getList({page, size}, {title, content, keyword})
+        .then((data) => {
+          setServerData(data);
+          console.log("current serverdata = ", data);
+          setFetching(false);
+        })
+        .catch((err) =>{
+            console.log("#################################### useEffect err ####################################");
+          exceptionHandle(err)});
   }, [page, size, title, content, keyword, refresh]);
 
   useEffect(() => {

@@ -18,9 +18,10 @@ const root = createBrowserRouter([
     path: '',
     element: (
       <Suspense fallback={Loading}>
-        <Main />
+        <Main/>
       </Suspense>
     ),
+    children: boardRouter(),
   },
   {
     path: 'about',
