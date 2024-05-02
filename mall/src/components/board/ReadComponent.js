@@ -42,7 +42,8 @@ const ReadComponent = ({bno}) => {
 
     const isAdmin = () => {
         let admin = false;
-        if (role.includes('ADMIN')) admin = true;
+        console.log("isAdmin role = " + role);
+        if (role !== undefined && role.includes('ADMIN')) admin = true;
 
         return admin;
     };
@@ -57,6 +58,7 @@ const ReadComponent = ({bno}) => {
         return modifiable;
     };
 
+
     useEffect(() => {
         setFetching(true);
 
@@ -69,7 +71,10 @@ const ReadComponent = ({bno}) => {
                 setFetching(false)
 
             })
-            .catch((err) => exceptionHandle(err));
+            .catch((err) => {
+                    exceptionHandle(err)
+                }
+            );
     }, [bno]);
 
     useEffect(() => {
@@ -141,17 +146,17 @@ const ReadComponent = ({bno}) => {
             )}
 
             {/* buttons..........start */}
-            <div className="flex justify-end p-2">
+            <div className="flex justify-end ">
                 <button
                     type="button"
-                    className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-500 hover:bg-blue-800"
+                    className="rounded  text-xl p-4 w-32 text-white bg-blue-500 hover:bg-blue-800"
                     onClick={() => moveToList()}
                 >
                     목록
                 </button>
                 <button
                     type="button"
-                    className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-500 hover:bg-blue-800"
+                    className="rounded ml-2 text-xl w-32 text-white bg-blue-500 hover:bg-blue-800"
                     onClick={() => moveToModify(bno)}
                     hidden={!isModifiable()}
                 >
@@ -159,7 +164,7 @@ const ReadComponent = ({bno}) => {
                 </button>
                 <button
                     type="button"
-                    className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
+                    className="rounded ml-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
                     onClick={() => initModal('delete')}
                     hidden={!isAdmin()}
                 >
@@ -168,7 +173,7 @@ const ReadComponent = ({bno}) => {
             </div>
 
             {/* 글 정보 */}
-            <div className="flex justify-end p-4">
+            <div className="flex justify-end mt-4">
                 <div className="mr-4">글번호: {board.bno} </div>
                 <div className="mr-4">작성자: {board.writer} </div>
                 <div>등록시간: {board.regTime}</div>
@@ -197,41 +202,27 @@ const ReadComponent = ({bno}) => {
 
 
             <div className="flex justify-center">
-                <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-                    <div className="w-1/5 p-6 text-right font-bold">제목</div>
-                    <div className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md">
+                <div className="relative mb-10 flex w-full flex-wrap items-stretch">
+                    {/*<div className="w-full p-6 text-right font-bold">제목</div>*/}
+                    <div className="w-full pb-2 border-b-gray-400 border-b-2 text-2xl font-extrabold">
                         {board.title}
                     </div>
                 </div>
             </div>
+
             <div className="flex justify-center">
-                <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-                    <div className="w-1/5 p-6 text-right font-bold">내용</div>
+                <div className="relative flex w-full flex-wrap items-stretch">
                     <textarea
-                        className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
-                        rows="14"
+                        className="w-full rounded-r"
+                        rows="30"
                         value={board.content}
                         readOnly={true}
                     ></textarea>
                 </div>
             </div>
-            {/*{makeDiv('내용', board.content)}*/}
-            {/*{makeDiv('작성자', board.writer)}*/}
-            {/*{makeDiv('등록시간', board.regTime)}*/}
-            {/*{makeDiv('수정시간', board.updateTime)}*/}
+
         </div>
     );
 };
-
-const makeDiv = (title, value) => (
-    <div className="flex justify-center">
-        <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-            <div className="w-1/5 p-6 text-right font-bold">{title}</div>
-            <div className="w-4/5 p-6 rounded-r border border-solid shadow-md">
-                {value}
-            </div>
-        </div>
-    </div>
-);
 
 export default ReadComponent;

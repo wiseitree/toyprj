@@ -7,7 +7,7 @@ const BasicMenu = () => {
     const loginState = useSelector((state) => state.loginSlice);
 
     return (
-        <nav id="navbar" className="flex justify-between items-center p-4 border-b-gray-300 border-2">
+        <nav id="navbar" className="flex justify-between items-center p-2 pl-9 pr-9 border-b-gray-300 border-b-2">
             <div className="flex items-center">
                 <a href='/'>
                     <img
@@ -21,9 +21,9 @@ const BasicMenu = () => {
 
             <div className="w-4/5  ">
                 <ul className="flex p-4 text-black font-light">
-                    <li className="pr-6 text-2xl hover:text-blue-600">
+                    {/*<li className="pr-6 text-2xl hover:text-blue-600">
                         <Link to={'/'}>Main</Link>
-                    </li>
+                    </li>*/}
                     {/*<li className="pr-6 text-2xl underline hover:underline-offset-8 hover:decoration-4">
             <Link to={'/about'}>About</Link>
           </li>*/}
@@ -50,7 +50,7 @@ const BasicMenu = () => {
                             <Link to={'/member/login'}>로그인</Link>
                         </div>
                         <div
-                            className=" text-sm m-1 rounded hover:text-blue-600">
+                            className=" text-sm m-1 ml-2 rounded hover:text-blue-600">
                             <Link to={'/member/register'}>회원가입</Link>
                         </div>
                     </>

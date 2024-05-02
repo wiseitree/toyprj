@@ -13,7 +13,7 @@ export const getOne = async (bno) => {
 export const getList = async (pageParam, searchParam) => {
   const { page, size } = pageParam;
   const { title, content, keyword } = searchParam;
-  const res = await jwtAxios.get(`${host}/list`, {
+  const res = await axios.get(`${host}/list`, {
     params: {
       page: page,
       size: size,

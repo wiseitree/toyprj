@@ -1,9 +1,11 @@
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import { postAdd } from '../../api/boardApi';
 import ResultModal from '../common/ResultModal';
 import useCustomMove from '../../hooks/useCustomMove';
 import { getCookie } from '../../util/cookieUtil';
 import FetchingModal from "../common/FetchingModal";
+import useCustomLogin from "../../hooks/useCustomLogin";
+import {useNavigate} from "react-router-dom";
 
 const initState = {
   title: '',
@@ -22,15 +24,27 @@ const AddComponent = () => {
   const [board, setBoard] = useState({ ...initState });
   const [modal, setModal] = useState({ ...modalState });
   const uploadRef = useRef();
-
+  const {exceptionHandle, moveToLogin} = useCustomLogin();
+  const navigate = useNavigate();
   const [fetching, setFetching] = useState(false)
   const [result, setResult] = useState('');
 
   const { moveToList } = useCustomMove();
 
   const memberInfo = getCookie('member');
-  board.email = memberInfo.email;
-  board.writer = memberInfo.nickname;
+
+  useEffect(() => {
+      if (memberInfo === undefined) {
+        alert("로그인 바랍니다.")
+        moveToLogin();
+        return;
+      }
+    board.email = memberInfo.email;
+    board.writer = memberInfo.nickname;
+  }, []);
+
+  /*board.email = memberInfo.email;
+  board.writer = memberInfo.nickname;*/
 
   const handleChangeBoard = (e) => {
     board[e.target.name] = e.target.value;
@@ -38,7 +52,7 @@ const AddComponent = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleClickAdd();
+    if (e.key === 'Enter') initModal('add')
   };
 
   const handleClickCancel = (bno) => {
@@ -71,6 +85,8 @@ const AddComponent = () => {
       })
       .catch((e) => {
         alert('제목 및 내용을 올바르게 입력 해 주세요.');
+        setResult('');
+        setFetching(false);
       });
   };
 
@@ -123,7 +139,7 @@ const AddComponent = () => {
   };
 
   return (
-      <div className="border-2 border-sky-200 mt-10 m-2 p-4">
+      <div className="border-2 border-sky-200 mt-10 m-2 p-4 pt-7">
         {fetching ? <FetchingModal/> : <></>}
 
         {/* 모달 처리 */}
@@ -138,26 +154,15 @@ const AddComponent = () => {
         )}
 
         <div className="flex justify-center">
-          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-            <div className="w-1/5 p-6 text-right font-bold">Files</div>
-            <input ref={uploadRef}
-                   className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
-                   type={'file'} multiple={true}
-            >
-            </input>
-          </div>
-        </div>
-
-        <div className="flex justify-center">
-          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-            <div className="w-1/5 p-6 text-right font-bold">제목</div>
+          <div className="relative mt-32 mb-10 flex w-full flex-wrap items-stretch">
             <input
-                className="w-4/5 p-6 rounded-r border border-solid border-neutral-500 shadow-md"
+                className="w-full pb-2 border-b-gray-400 border-b-2 text-2xl font-extrabold"
                 name="title"
                 type={'text'}
                 value={board.title}
                 onChange={handleChangeBoard}
                 autoFocus={true}
+                placeholder="제목을 입력해 주세요."
             ></input>
             <div className="absolute bottom-0 right-0 text-gray-500">
               {calcContentLen('title')}
@@ -166,16 +171,16 @@ const AddComponent = () => {
         </div>
 
         <div className="flex justify-center">
-          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-            <div className="w-1/5 p-6 text-right font-bold">내용</div>
+          <div className="relative mb-10 flex w-full flex-wrap items-stretch border-b-gray-400 border-b-2">
             <textarea
-                className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+                className="w-full"
                 name="content"
                 type={'text'}
                 value={board.content}
                 onChange={handleChangeBoard}
-                rows="14"
+                rows="30"
                 onKeyDown={handleKeyDown}
+                placeholder="내용을 입력해 주세요."
             ></textarea>
             <div className="absolute bottom-0 right-0 text-gray-500">
               {calcContentLen('content')}
@@ -183,18 +188,28 @@ const AddComponent = () => {
           </div>
         </div>
 
-        <div className="flex justify-end p-4">
+        <div className="flex justify-center">
+          <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+            <input ref={uploadRef}
+                   className="w-auto"
+                   type={'file'} multiple={true}
+            >
+            </input>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
           {/*<div className="relative mb-4 flex p-4 flex-wrap items-stretch">*/}
           <button
               type="button"
-              className="rounded p-4 mr-2 w-36 bg-gray-400 text-xl  text-white hover:bg-gray-500"
+              className="rounded p-4 w-32 bg-gray-400 text-xl  text-white hover:bg-gray-500"
               onClick={() => initModal('cancel')}
           >
             취소
           </button>
           <button
               type="button"
-              className="rounded p-4  w-36 bg-blue-500 text-xl  text-white hover:bg-blue-800"
+              className="rounded p-4 ml-2 w-32 bg-blue-500 text-xl  text-white hover:bg-blue-800"
               onClick={() => initModal('add')}
           >
             등록

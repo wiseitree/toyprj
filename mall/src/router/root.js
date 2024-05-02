@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import {createBrowserRouter, Navigate} from 'react-router-dom';
 import todoRouter from './todoRouter';
 import memberRouter from './memberRouter';
 import boardRouter from './boardRouter';
@@ -16,11 +16,7 @@ const BoardIndex = lazy(() => import('../pages/board/IndexPage'));
 const root = createBrowserRouter([
   {
     path: '',
-    element: (
-      <Suspense fallback={Loading}>
-        <Main/>
-      </Suspense>
-    ),
+    element: <Navigate replace to="board/list" />,
     children: boardRouter(),
   },
   {
