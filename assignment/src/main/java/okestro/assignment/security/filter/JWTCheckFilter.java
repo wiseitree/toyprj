@@ -35,6 +35,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             return true;
         }
 
+        if (path.startsWith("/api/board/list")){
+            log.info("current uri ..........{}", path);
+            return true;
+        }
+
         return false;
     }
 

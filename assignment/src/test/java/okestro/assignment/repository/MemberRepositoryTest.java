@@ -52,7 +52,7 @@ class MemberRepositoryTest {
     @Test()
     public void read(){
         //given
-        String email = "admin@aaa.com";
+        String email = "user1@aaa.com";
 
         //when
         Optional<Member> result = memberRepository.findByEmail(email);

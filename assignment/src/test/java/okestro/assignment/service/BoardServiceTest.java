@@ -15,7 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,8 +40,8 @@ class BoardServiceTest {
         //given
         String title = "title register";
         String content = "content register";
-        String email = "usertest@aaa.com";
-        String writer = "testuser";
+        String email = "user1@aaa.com";
+        String writer = "user1";
 
         BoardDTO boardDTO = BoardDTO.builder()
                 .title(title)
@@ -48,13 +50,21 @@ class BoardServiceTest {
                 .writer(writer)
                 .build();
 
+        boardDTO.setUploadFileNames(
+                List.of(
+                        UUID.randomUUID() + "_" + "Test1.jpg",
+                        UUID.randomUUID() + "_" + "Test2.jpg"
+                )
+        );
+
         //when
         Long bno = boardService.register(boardDTO);
+
         Board savedBoard = boardRepository.findByBno(bno).get();
 
         //then
         assertThat(savedBoard.getTitle()).isEqualTo("title register");
-        assertThat(savedBoard.getMember().getEmail()).isEqualTo("usertest@aaa.com");
+        assertThat(savedBoard.getMember().getEmail()).isEqualTo("user1@aaa.com");
         log.info("############################## savedBoard = {}", savedBoard);
         log.info("############################## savedBoard.getMember = {}", savedBoard.getMember());
 
@@ -63,20 +73,21 @@ class BoardServiceTest {
     @Test
     public void getBoardDtl() {
         //given
-        Long bno = 138L;
+        Long bno = 153L;
 
         //when
         BoardDTO boardDTO = boardService.getBoardDtl(bno);
 
         //then
         log.info("##############################boardDTO = {}" , boardDTO);
+        Board board = boardRepository.findByBno(bno).get();
 
     }
 
     @Test
     public void modify(){
         //given
-        Long bno = 139L;
+        Long bno = 154L;
         String title = "title update";
         String content = "content update";
         String currentEmail = "user1@aaa.com";
@@ -88,6 +99,14 @@ class BoardServiceTest {
                 .updateTime(LocalDateTime.now())
                 .build();
 
+        boardDTO.setUploadFileNames(
+                List.of(
+                        UUID.randomUUID() + "_" + "update_test1.jpg",
+                        UUID.randomUUID() + "_" + "update_test2.jpg"
+                )
+        );
+
+
         //when
         boardService.modify(bno, boardDTO, currentEmail);
         Board board = boardRepository.findByBno(bno).get();
@@ -95,14 +114,15 @@ class BoardServiceTest {
         //then
         assertThat(board.getTitle()).isEqualTo("title update");
         assertThat(board.getContent()).isEqualTo("content update");
+        log.info("##############################board = {}" , board);
 
     }
 
     @Test
     public void remove(){
         //given
-        Long bno = 53L;
-        String currentEmail = "admin@aaa.com";
+        Long bno = 154L;
+        String currentEmail = "user1@aaa.com";
 
         //when
         boardService.remove(bno, currentEmail);
@@ -117,7 +137,6 @@ class BoardServiceTest {
     public void getPageResponse(){
         //given
         PageRequestDTO pageRequestDTO = new PageRequestDTO();
-        pageRequestDTO.setPage(3);
 
         BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()
                 .title("title")
@@ -134,8 +153,5 @@ class BoardServiceTest {
         log.info("############################## getPageResponse ##############################");
 
     }
-
-
-
 
 }

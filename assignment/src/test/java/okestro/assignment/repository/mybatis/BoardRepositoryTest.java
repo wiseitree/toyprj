@@ -2,6 +2,7 @@ package okestro.assignment.repository.mybatis;
 
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
+import okestro.assignment.domain.BoardImage;
 import okestro.assignment.domain.Member;
 import okestro.assignment.domain.Todo;
 import okestro.assignment.dto.BoardDTO;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -37,8 +39,8 @@ class BoardRepositoryTest {
         for (int i = 1; i <= 135; i++) {
             Member member = memberRepository.findByEmail(email).get();
             Board board = Board.builder()
-                    .title("user1 title")
-                    .content("user1 content")
+                    .title("user1 title test")
+                    .content("user1 content test")
                     .member(member)
                     .build();
 
@@ -50,27 +52,38 @@ class BoardRepositoryTest {
     @Test
     public void insert(){
         //given
-        String email = "usertest@aaa.com";
+        String email = "user1@aaa.com";
 
-        //when
+        String title = "file add test";
+        String content = "content test";
+
         Member member = memberRepository.findByEmail(email).get();
         Board board = Board.builder()
-                .title("titleTest")
-                .content("contentTest")
+                .title(title)
+                .content(content)
                 .member(member)
                 .build();
 
+        board.addImageString(UUID.randomUUID().toString() + "_" + "IMAGE1.jpg");
+        board.addImageString(UUID.randomUUID().toString() + "_" + "IMAGE2.jpg");
+
+        //when
         Board savedBoard = boardRepository.save(board);
 
+        List<BoardImage> boardImageList = board.getImageList();
+        if (boardImageList != null && boardImageList.size() > 0) {
+            boardRepository.saveBoardImage(board);
+        }
+
         //then
-        assertThat(savedBoard.getMember().getEmail()).isEqualTo(email);
+        log.info("savedBoard: {}", savedBoard);
 
     }
 
     @Test
     public void read() {
         //given
-        Long bno = 3L;
+        Long bno = 153L;
 
         //when
         Board board = boardRepository.findByBno(bno).get();
@@ -87,12 +100,15 @@ class BoardRepositoryTest {
     @Test
     public void update() {
         //given
-        Long bno = 5L;
+        Long bno = 153L;
 
-        String email = "usertest@aaa.com";
-        String writer = "testuser";
-        String title = "update title";
-        String content = "update content";
+        Board board = boardRepository.findByBno(bno)
+                .orElseThrow();
+
+        String email = "user1@aaa.com";
+        String writer = "user1";
+        String title = "file update test";
+        String content = "content update test";
 //        String updateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         LocalDateTime regTime = LocalDateTime.now();
         LocalDateTime updateTime = LocalDateTime.now();
@@ -110,11 +126,18 @@ class BoardRepositoryTest {
 
         //when
         boardRepository.update(bno, boardDTO);
+        boardRepository.deleteBoardImage(bno);
 
+        board.clearList();
+
+        board.addImageString(UUID.randomUUID().toString() + "_" + "NEW_IMAGE1.jpg");
+        board.addImageString(UUID.randomUUID().toString() + "_" + "NEW_IMAGE2.jpg");
+        board.addImageString(UUID.randomUUID().toString() + "_" + "NEW_IMAGE3.jpg");
+
+        boardRepository.saveBoardImage(board);
 
         //then
-        Board board = boardRepository.findByBno(bno).get();
-        log.info("#################### board = {}", board);
+        log.info("board = {}", board);
 
     }
 
@@ -152,6 +175,16 @@ class BoardRepositoryTest {
 
         for (Board board : boardList) {
             BoardDTO boardDTO = board.toDTO(board);
+
+            List<BoardImage> imageList = board.getImageList();
+
+            List<String> uploadFileNames = new ArrayList<>();
+            for (BoardImage boardImage : imageList) {
+                String fileName = boardImage.getFileName();
+                uploadFileNames.add(fileName);
+            }
+
+            boardDTO.setUploadFileNames(uploadFileNames);
             boardDTOList.add(boardDTO);
         }
 

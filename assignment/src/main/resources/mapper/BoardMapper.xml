@@ -10,6 +10,12 @@
         values (#{title}, #{content}, #{member.email}, #{member.nickname})
     </insert>
 
+    <insert id="saveBoardImage" parameterType="Board">
+        insert into board_image(board_bno, file_name, ord) values
+        <foreach collection="imageList" item="image" separator=",">
+            (#{bno}, #{image.fileName}, #{image.ord})
+        </foreach>
+    </insert>
 
     <!-- findByBno - Board 객체를 매핑하는 resultMap-->
     <resultMap id="boardMap" type="Board">
@@ -20,6 +26,7 @@
         <result property="regTime" column="reg_time"/>
         <result property="updateTime" column="update_time"/>
         <association property="member" column="email" resultMap="memberMap"/>
+        <collection property="imageList" ofType="BoardImage" resultMap="boardImageMap"/>
     </resultMap>
 
     <!-- findByBno - Member 객체를 매핑하는 resultMap-->
@@ -30,10 +37,16 @@
         <result property="social" column="social"/>
     </resultMap>
 
+    <resultMap id="boardImageMap" type="BoardImage">
+        <result property="fileName" column="file_name"/>
+        <result property="ord" column="ord"/>
+    </resultMap>
+
     <select id="findByBno" resultMap="boardMap">
-        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname
+        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname, bi.file_name, bi.ord
         from board b
         left join member m on b.email = m.email
+        left join board_image bi on b.bno = bi.board_bno
         where b.bno = #{bno}
     </select>
 
@@ -51,10 +64,17 @@
         where bno = #{bno}
     </delete>
 
+    <delete id="deleteBoardImage">
+        delete
+        from board_image
+        where board_bno = #{bno}
+    </delete>
+
     <select id="findBoardList" resultMap="boardMap">
-        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname
+        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname, bi.file_name, bi.ord
         from board b
         left join member m on b.email = m.email
+        left join board_image bi on b.bno = bi.board_bno and bi.ord = 0
         <where>
             <if test="boardSearchDTO.title != null and boardSearchDTO.title != ''">
                 or b.title like concat('%', #{boardSearchDTO.keyword}, '%')

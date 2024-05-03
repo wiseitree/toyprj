@@ -2,10 +2,10 @@ const PageComponent = ({ serverData, movePage }) => {
   console.log('pagecomponent - pageNumList=' + serverData.pageNumList);
 
   return (
-    <div className="m-6 flex justify-center">
+    <div className="m-6 mt-2 flex justify-center">
       {serverData.prev ? (
         <div
-          className="m-2 p-2 w-16 text-center  font-bold text-blue-400 hover:text-blue-800 "
+          className="m-1 p-3 w-16 text-center  font-bold text-blue-400 hover:text-blue-800 "
           onClick={() =>
             movePage({
               page: serverData.prevPage,
@@ -23,7 +23,7 @@ const PageComponent = ({ serverData, movePage }) => {
       {serverData.pageNumList.map((pageNum) => (
         <div
           key={pageNum}
-          className={`m-2 p-2 w-12  text-center rounded shadow-md text-white ${serverData.current === pageNum ? 'bg-blue-800' : 'bg-blue-400'}
+          className={`m-1 p-3 w-12  text-center rounded shadow-md text-white ${serverData.current === pageNum ? 'bg-blue-800' : 'bg-blue-400'}
           hover:bg-blue-800 `}
           onClick={() =>
             movePage({
@@ -39,7 +39,7 @@ const PageComponent = ({ serverData, movePage }) => {
 
       {serverData.next ? (
         <div
-          className="m-2 p-2 w-16 text-center font-bold text-blue-400 hover:text-blue-800"
+          className="m-1 p-3 w-16 text-center font-bold text-blue-400 hover:text-blue-800"
           onClick={() =>
             movePage({
               page: serverData.nextPage,

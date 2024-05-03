@@ -3,6 +3,7 @@ package okestro.assignment.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
+import okestro.assignment.domain.BoardImage;
 import okestro.assignment.domain.Member;
 import okestro.assignment.domain.MemberRole;
 import okestro.assignment.dto.BoardDTO;
@@ -36,8 +37,16 @@ public class BoardServiceImpl implements BoardService {
     public Long register(BoardDTO boardDTO) {
         log.info("#################### BoardServiceImpl - register");
         Member member = memberRepository.findByEmail(boardDTO.getEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        Board board = boardDTO.toEntity(boardDTO, member);
+
+        Board board = dtoToEntity(boardDTO, member);
+
         Board savedBoard = boardRepository.save(board);
+
+        List<BoardImage> boardImageList = board.getImageList();
+        if (boardImageList != null && boardImageList.size() > 0) {
+            boardRepository.saveBoardImage(board);
+        }
+
         Long bno = savedBoard.getBno();
 
         return bno;
@@ -46,9 +55,9 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public BoardDTO getBoardDtl(Long bno) {
         log.info("#################### BoardServiceImpl - getBoardDtl");
-        Board board = boardRepository.findByBno(bno).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+        Board board = boardRepository.findByBno(bno).orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시판입니다."));
         log.info("########## board = {}", board);
-        BoardDTO boardDTO = board.toDTO(board);
+        BoardDTO boardDTO = entityToDTO(board);
         return boardDTO;
     }
 
@@ -63,6 +72,21 @@ public class BoardServiceImpl implements BoardService {
         boardDTO.setBno(bno);
         boardDTO.setUpdateTime(LocalDateTime.now());
         boardRepository.update(bno, boardDTO);
+
+        List<String> uploadFileNames = boardDTO.getUploadFileNames();
+        Board board = boardRepository.findByBno(boardDTO.getBno()).get();
+
+        board.clearList();
+        boardRepository.deleteBoardImage(bno);
+
+        if (uploadFileNames != null && uploadFileNames.size() > 0){
+
+            uploadFileNames.stream().forEach(uploadFileName -> {
+                board.addImageString(uploadFileName);
+            });
+            boardRepository.saveBoardImage(board);
+        }
+
     }
 
     @Override
@@ -94,8 +118,14 @@ public class BoardServiceImpl implements BoardService {
 
         List<Board> boardList = boardRepository.findBoardList(offset, limit, boardSearchDTO);
         List<BoardDTO> boardDTOList = new ArrayList<>();
+
         for (Board board : boardList) {
             BoardDTO boardDTO = board.toDTO(board);
+            List<BoardImage> imageList = board.getImageList();
+
+            List<String> uploadFileNames = createUploadFileNames(imageList);
+
+            boardDTO.setUploadFileNames(uploadFileNames);
             boardDTOList.add(boardDTO);
         }
 
@@ -106,6 +136,17 @@ public class BoardServiceImpl implements BoardService {
                 .build();
 
         return pageResponseDTO;
+    }
+
+    private static List<String> createUploadFileNames(List<BoardImage> imageList) {
+        List<String> uploadFileNames = new ArrayList<>();
+
+        for (BoardImage boardImage : imageList) {
+            String fileName = boardImage.getFileName();
+            uploadFileNames.add(fileName);
+        }
+
+        return uploadFileNames;
     }
 
 
@@ -135,5 +176,36 @@ public class BoardServiceImpl implements BoardService {
         return admin;
     }
 
+    private Board dtoToEntity(BoardDTO boardDTO, Member member){
+        Board board = boardDTO.toEntity(boardDTO, member);
+
+        List<String> uploadFileNames = boardDTO.getUploadFileNames();
+
+        if (uploadFileNames == null)
+            return board;
+
+        for (String uploadFileName : uploadFileNames) {
+            board.addImageString(uploadFileName);
+        }
+
+        return board;
+    }
+
+    private BoardDTO entityToDTO(Board board){
+        BoardDTO boardDTO = board.toDTO(board);
+        List<BoardImage> imageList = board.getImageList();
+
+        if (imageList == null || imageList.size() == 0){
+            return boardDTO;
+        }
+
+
+        List<String> fileNameList = imageList.stream().map(boardImage ->
+                boardImage.getFileName()).toList();
+
+        boardDTO.setUploadFileNames(fileNameList);
+
+        return boardDTO;
+    }
 
 }
