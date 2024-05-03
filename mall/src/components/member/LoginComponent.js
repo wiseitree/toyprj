@@ -13,8 +13,8 @@ const LoginComponent = () => {
   const [loginParam, setLoginParam] = useState({ ...initState });
 
   /*const navigate = useNavigate();
-
-  const dispatch = useDispatch();*/
+  
+    const dispatch = useDispatch();*/
 
   const { doLogin, moveToPath } = useCustomLogin();
 
@@ -36,6 +36,7 @@ const LoginComponent = () => {
         console.log('##########LoginComponent doLogin ##########');
         console.log('########## doLogin ##########');
         console.log(data);
+        console.log(data.roleNames);
         console.log('####################');
         console.log(data.email);
         console.log('####################');

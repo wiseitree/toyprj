@@ -26,7 +26,7 @@ class TodoRepositoryTest {
 
     @BeforeEach
     void createDummy() {
-        for (int i = 1; i <= 135; i++) {
+        for (int i = 1; i <= 38; i++) {
 
             Todo todo = Todo.builder()
                     .title("title..." + i)

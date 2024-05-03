@@ -12,12 +12,19 @@ const initState = {
   email: '',
 };
 
+const modalState = {
+  title: '',
+  content: '',
+};
+
 const ModifyComponent = ({ bno }) => {
   const loginState = useSelector((state) => state.loginSlice);
   const currentMemberEmail = loginState.email;
   const { exceptionHandle } = useCustomLogin();
   const [board, setBoard] = useState({ ...initState });
   const [boardOwnerEmail, setBoardOwnerEmail] = useState('');
+  const [modal, setModal] = useState({ ...modalState });
+
   console.log('currentMemberEmail = ' + currentMemberEmail);
   console.log('boardOwnerEmail = ' + boardOwnerEmail);
 
@@ -61,21 +68,21 @@ const ModifyComponent = ({ bno }) => {
       .catch((err) => exceptionHandle(err));
   }, [bno]);
 
-  const handleClickCancel = () => {
+  const handleClickCancel = (bno) => {
     moveToRead(bno);
   };
 
-  const handleClickModify = () => {
+  const handleClickModify = (board, currentMemberEmail) => {
     putOne(board, currentMemberEmail)
       .then((data) => {
         console.log('modify result: ' + data);
-        const msg = data.result;
-        if (msg === 'fail') {
-          alert('다른 사람의 게시글을 수정할 수 없습니다.');
-          moveToRead(bno);
-        }
+        // const msg = data.result;
+        // if (msg === 'fail') {
+        //   alert('다른 사람의 게시글을 수정할 수 없습니다.');
+        //   moveToRead(bno);
+        // }
 
-        setResult('Modified');
+        closeModal('modified', board.bno);
       })
       .catch((err) => {
         console.log(err);
@@ -83,21 +90,41 @@ const ModifyComponent = ({ bno }) => {
       });
   };
 
-  const handleClickDelete = () => {
+  const handleClickDelete = (bno, currentMemberEmail) => {
     deleteOne(bno, currentMemberEmail).then((data) => {
       console.log('delete result: ', data);
       const msg = data.result;
-      if (msg === 'fail') {
-        alert('다른 사람의 게시글을 지울 수 없습니다.');
-        moveToRead(bno);
-      }
-      setResult('Deleted');
+      // if (msg === 'fail') {
+      //   alert('다른 사람의 게시글을 지울 수 없습니다.');
+      //   moveToRead(bno);
+      // }
+      closeModal('deleted');
     });
   };
 
+  const initModal = (modifyType) => {
+    if (modifyType === 'delete') {
+      setResult('deleted');
+      setModal({ ...modal, title: '삭제', content: '정말 삭제하시겠습니까?' });
+    }
+    if (modifyType === 'modify') {
+      setResult('modified');
+      setModal({ ...modal, title: '수정', content: '정말 수정하시겠습니까?' });
+    }
+  };
+
+  const handleModal = {
+    bno: bno,
+    board: board,
+    currentMemberEmail: currentMemberEmail,
+    handleClickCancel: handleClickCancel,
+    handleClickDelete: handleClickDelete,
+    handleClickModify: handleClickModify,
+  };
+
   //모달 창이 close될 때
-  const closeModal = () => {
-    if (result === 'Deleted') {
+  const closeModal = (result, bno) => {
+    if (result === 'deleted') {
       moveToList();
     } else {
       moveToRead(bno);
@@ -129,9 +156,9 @@ const ModifyComponent = ({ bno }) => {
     <div className="border-2 border-sky-200 mt-10 m-2 p-4">
       {result ? (
         <ResultModal
-          title={'처리결과'}
-          content={result}
-          callbackFn={closeModal}
+          title={modal.title}
+          content={modal.content}
+          handleModal={handleModal}
         ></ResultModal>
       ) : (
         <></>
@@ -140,8 +167,8 @@ const ModifyComponent = ({ bno }) => {
       <div className="flex justify-end p-4">
         <button
           type="button"
-          className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-400 hover:bg-blue-800"
-          onClick={handleClickCancel}
+          className="rounded p-4 m-2 text-xl w-32 text-white bg-gray-400 hover:bg-gray-500"
+          onClick={() => handleClickCancel(bno)}
           hidden={!isModifiable()}
         >
           취소
@@ -149,7 +176,7 @@ const ModifyComponent = ({ bno }) => {
         <button
           type="button"
           className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
-          onClick={handleClickDelete}
+          onClick={() => initModal('delete')}
           hidden={!isModifiable()}
         >
           삭제
@@ -157,7 +184,7 @@ const ModifyComponent = ({ bno }) => {
         <button
           type="button"
           className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
-          onClick={handleClickModify}
+          onClick={() => initModal('modify')}
           hidden={!isModifiable()}
         >
           수정

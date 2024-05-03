@@ -2,6 +2,7 @@ package okestro.assignment.repository;
 
 import okestro.assignment.domain.Board;
 import okestro.assignment.dto.BoardDTO;
+import okestro.assignment.dto.BoardSearchDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,8 +20,9 @@ public interface BoardMapper {
 
     void deleteByBno(Long bno);
 
-    List<Board> findBoardList(@Param("offset") int offset, @Param("limit") int limit);
+    List<Board> findBoardList(@Param("offset") int offset, @Param("limit") int limit, @Param("boardSearchDTO")
+    BoardSearchDTO boardSearchDTO);
 
-    int getTotalCount();
+    int getTotalCount(BoardSearchDTO boardSearchDTO);
 
 }

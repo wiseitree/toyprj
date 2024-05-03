@@ -5,6 +5,7 @@ import okestro.assignment.domain.Board;
 import okestro.assignment.domain.Member;
 import okestro.assignment.domain.Todo;
 import okestro.assignment.dto.BoardDTO;
+import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.repository.BoardRepository;
 import okestro.assignment.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
@@ -134,11 +135,18 @@ class BoardRepositoryTest {
     @Test
     public void findBoardList() {
         //given
-        int offset = 10;
-        int limit = 20;
+        int offset = 0;
+        int limit = 10;
+
+        BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()
+                .title("title")
+                .content("content")
+                .keyword("test")
+                .build();
+
 
         //when
-        List<Board> boardList = boardRepository.findBoardList(offset, limit);
+        List<Board> boardList = boardRepository.findBoardList(offset, limit, boardSearchDTO);
         List<BoardDTO> boardDTOList = new ArrayList<>();
 
 
@@ -154,7 +162,7 @@ class BoardRepositoryTest {
         }
         log.info("#################### BoardRepositoryTest - findBoardList ##############################");
 
-        int totalCount = boardRepository.getTotalCount();
+        int totalCount = boardRepository.getTotalCount(boardSearchDTO);
         log.info("#################### totalCount = {}", totalCount);
 
     }

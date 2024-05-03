@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import useCustomMove from '../../hooks/useCustomMove';
 import useCustomLogin from '../../hooks/useCustomLogin';
-import { getOne } from '../../api/boardApi';
+import { deleteOne, getOne } from '../../api/boardApi';
 import { useSelector } from 'react-redux';
+import ResultModal from '../common/ResultModal';
 
 const initState = {
   bno: 0,
@@ -14,13 +15,28 @@ const initState = {
   email: '',
 };
 
+const modalState = {
+  title: '',
+  content: '',
+};
+
 const ReadComponent = ({ bno }) => {
   const loginState = useSelector((state) => state.loginSlice);
   const { exceptionHandle } = useCustomLogin();
   const [board, setBoard] = useState(initState);
   const [boardOwnerEmail, setBoardOwnerEmail] = useState('');
-  const { moveToList, moveToModify } = useCustomMove();
+  const { moveToRead, moveToList, moveToModify } = useCustomMove();
+  const [result, setResult] = useState('');
   const currentMemberEmail = loginState.email;
+  const role = loginState.roleNames;
+  const [modal, setModal] = useState({ ...modalState });
+
+  const isAdmin = () => {
+    let admin = false;
+    if (role.includes('ADMIN')) admin = true;
+
+    return admin;
+  };
 
   const isModifiable = () => {
     let modifiable = false;
@@ -41,8 +57,50 @@ const ReadComponent = ({ bno }) => {
       .catch((err) => exceptionHandle(err));
   }, [bno]);
 
+  const initModal = (modifyType) => {
+    if (modifyType === 'delete') {
+      setResult('deleted');
+      setModal({ ...modal, title: '삭제', content: '정말 삭제하시겠습니까?' });
+    }
+  };
+
+  const handleClickCancel = (bno) => {
+    setResult('');
+  };
+
+  const handleClickDelete = (bno, currentMemberEmail) => {
+    deleteOne(bno, currentMemberEmail).then((data) => {
+      console.log('delete result: ', data);
+      closeModal('deleted');
+    });
+  };
+
+  const handleModal = {
+    bno: bno,
+    board: board,
+    currentMemberEmail: currentMemberEmail,
+    handleClickCancel: handleClickCancel,
+    handleClickDelete: handleClickDelete,
+    handleClickModify: '',
+  };
+
+  //모달 창이 close될 때
+  const closeModal = (result, bno) => {
+    if (result === 'deleted') moveToList();
+  };
+
   return (
     <div className="border-2 border-sky-200 mt-10 m-2 p-4 ">
+      {result ? (
+        <ResultModal
+          title={modal.title}
+          content={modal.content}
+          handleModal={handleModal}
+        ></ResultModal>
+      ) : (
+        <></>
+      )}
+
       {/* buttons..........start */}
       <div className="flex justify-end p-4">
         <button
@@ -59,6 +117,14 @@ const ReadComponent = ({ bno }) => {
           hidden={!isModifiable()}
         >
           수정
+        </button>
+        <button
+          type="button"
+          className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500 hover:bg-red-800"
+          onClick={() => initModal('delete')}
+          hidden={!isAdmin()}
+        >
+          삭제
         </button>
       </div>
 

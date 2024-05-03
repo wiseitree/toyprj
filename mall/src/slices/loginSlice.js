@@ -26,13 +26,14 @@ const loginSlice = createSlice({
   initialState: loadMemberCookie() || initState,
   reducers: {
     login: (state, action) => {
-      console.log('login.....');
+      console.log('#################### loginSlice.....');
+      console.log('action.payload = ', action.payload);
 
       const data = action.payload;
       return { email: data.email };
     },
     logout: (state, action) => {
-      console.log('logout.....');
+      console.log('################## logout.....');
       removeCookie('member');
       return { ...initState };
     },
@@ -40,7 +41,7 @@ const loginSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loginPostAsync.fulfilled, (state, action) => {
-        console.log('fulfilled');
+        console.log('###### fulfilled');
 
         const payload = action.payload;
         if (!payload.error) {
@@ -49,7 +50,7 @@ const loginSlice = createSlice({
         return payload;
       })
       .addCase(loginPostAsync.pending, (state, action) => {
-        console.log('pending');
+        console.log('##### pending');
       })
       .addCase(loginPostAsync.rejected, (state, action) => {
         console.log('rejected');

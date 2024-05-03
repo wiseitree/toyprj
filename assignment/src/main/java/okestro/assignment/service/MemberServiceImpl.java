@@ -35,7 +35,8 @@ public class MemberServiceImpl implements MemberService{
     public boolean checkDuplicate(String currentData) {
         boolean isDuplicated = false;
 
-        String[] splitData = currentData.split(":");
+        //encodeURIComponent()에 의해 ':' --> '%3' 으로 인식
+        String[] splitData = currentData.split("%3");
 
         if (splitData.length != 2)
             throw new CustomInvalidDataException("유효하지 않은 값을 입력하셨습니다.");
@@ -52,7 +53,7 @@ public class MemberServiceImpl implements MemberService{
                 .nickname(memberFormDTO.getNickname())
                 .build();
 
-        member.addRole(MemberRole.USER);
+        member.addRole(MemberRole.ADMIN);
 
         return member;
     }

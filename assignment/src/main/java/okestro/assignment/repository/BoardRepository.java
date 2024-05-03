@@ -3,6 +3,7 @@ package okestro.assignment.repository;
 import lombok.RequiredArgsConstructor;
 import okestro.assignment.domain.Board;
 import okestro.assignment.dto.BoardDTO;
+import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.repository.BoardMapper;
 import org.springframework.stereotype.Repository;
 
@@ -32,11 +33,11 @@ public class BoardRepository {
         boardMapper.deleteByBno(bno);
     }
 
-    public List<Board> findBoardList(int offset, int limit){
-        return boardMapper.findBoardList(offset, limit);
+    public List<Board> findBoardList(int offset, int limit, BoardSearchDTO boardSearchDTO){
+        return boardMapper.findBoardList(offset, limit, boardSearchDTO);
     }
 
-    public int getTotalCount(){
-        return boardMapper.getTotalCount();
+    public int getTotalCount(BoardSearchDTO boardSearchDTO){
+        return boardMapper.getTotalCount(boardSearchDTO);
     }
 }
