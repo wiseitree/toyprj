@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="okestro.assignment.repository.CommentMapper">
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="cno">
+        insert into comment(bno, content, email, nickname)
+        values (#{bno}, #{content}, #{email}, #{nickname})
+    </insert>
+
+    <select id="findByCno" resultType="Comment">
+        select *
+        from comment
+        where cno = #{cno}
+    </select>
+
+    <select id="findCommentList" resultType="Comment">
+        select *
+        from comment
+        where bno = #{bno}
+    </select>
+
+</mapper>

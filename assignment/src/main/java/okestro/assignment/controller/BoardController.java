@@ -39,7 +39,6 @@ public class BoardController {
     }
 
     /*@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")*/
-
     @PreAuthorize("permitAll()")
     @GetMapping("/list")
     public PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO, BoardSearchDTO boardSearchDTO) {

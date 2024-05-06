@@ -1,21 +1,16 @@
-package okestro.assignment.repository.mybatis;
+package okestro.assignment.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
 import okestro.assignment.domain.BoardImage;
 import okestro.assignment.domain.Member;
-import okestro.assignment.domain.Todo;
 import okestro.assignment.dto.BoardDTO;
 import okestro.assignment.dto.BoardSearchDTO;
-import okestro.assignment.repository.BoardRepository;
-import okestro.assignment.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +78,7 @@ class BoardRepositoryTest {
     @Test
     public void read() {
         //given
-        Long bno = 153L;
+        Long bno = 30L;
 
         //when
         Board board = boardRepository.findByBno(bno).get();
