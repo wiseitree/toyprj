@@ -29,9 +29,6 @@ public class CommentServiceImpl implements CommentService {
         Member currentMember = memberRepository.findByEmail(commentDTO.getEmail())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        String currentNickname = currentMember.getNickname();
-        commentDTO.setNickname(currentNickname);
-
         Comment comment = commentDTO.toEntity(commentDTO);
         Comment savedComment = commentRepository.save(comment);
 

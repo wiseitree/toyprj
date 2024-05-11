@@ -43,9 +43,6 @@ const AddComponent = () => {
     board.writer = memberInfo.nickname;
   }, []);
 
-  /*board.email = memberInfo.email;
-  board.writer = memberInfo.nickname;*/
-
   const handleChangeBoard = (e) => {
     board[e.target.name] = e.target.value;
     setBoard({ ...board });

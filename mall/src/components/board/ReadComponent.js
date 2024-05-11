@@ -5,6 +5,7 @@ import {deleteOne, getOne} from '../../api/boardApi';
 import {useSelector} from 'react-redux';
 import ResultModal from '../common/ResultModal';
 import FetchingModal from "../common/FetchingModal";
+import CommentSectionComponent from "../comment/CommentSectionComponent";
 
 const initState = {
     bno: 0,
@@ -25,12 +26,14 @@ const modalState = {
 const ReadComponent = ({bno}) => {
     const loginState = useSelector((state) => state.loginSlice);
     const {exceptionHandle} = useCustomLogin();
-    const [board, setBoard] = useState(initState);
+    const [board, setBoard] = useState({...initState});
     const [boardOwnerEmail, setBoardOwnerEmail] = useState('');
-    const {moveToRead, moveToList, moveToModify} = useCustomMove();
+    const {moveToList, moveToModify} = useCustomMove();
     const [result, setResult] = useState('');
+
     const currentMemberEmail = loginState.email;
-    const role = loginState.roleNames;
+    const currentMemberRole = loginState.roleNames;
+
     const [modal, setModal] = useState({...modalState});
     const [fetching, setFetching] = useState(false);
     const [fileList, setFileList] = useState([]);
@@ -38,12 +41,9 @@ const ReadComponent = ({bno}) => {
     const fileListRef = useRef(null);
     const fileCountRef = useRef(null);
 
-    console.log("current uploadFileNames = ", board.uploadFileNames);
-
     const isAdmin = () => {
         let admin = false;
-        console.log("isAdmin role = " + role);
-        if (role !== undefined && role.includes('ADMIN')) admin = true;
+        if (currentMemberRole !== undefined && currentMemberRole.includes('ADMIN')) admin = true;
 
         return admin;
     };
@@ -57,7 +57,6 @@ const ReadComponent = ({bno}) => {
 
         return modifiable;
     };
-
 
     useEffect(() => {
         setFetching(true);
@@ -76,11 +75,11 @@ const ReadComponent = ({bno}) => {
                 }
             );
     }, [bno]);
-
+    
     useEffect(() => {
         // Add event listener to detect clicks outside file list area
         const handleClickOutside = (event) => {
-            if (fileListRef.current && !fileListRef.current.contains(event.target) && !fileCountRef.current.contains(event.target)) {
+            if (!fileListRef.current.contains(event.target) && !fileCountRef.current.contains(event.target)) {
                 setShowFileList(false);
             }
         };
@@ -93,7 +92,6 @@ const ReadComponent = ({bno}) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
 
     const getOrgFileName = (fileName) => {
         return fileName.substring(37);
@@ -112,7 +110,6 @@ const ReadComponent = ({bno}) => {
 
     const handleClickDelete = (bno, currentMemberEmail) => {
         deleteOne(bno, currentMemberEmail).then((data) => {
-            console.log('delete result: ', data);
             closeModal('deleted');
         });
     };
@@ -203,7 +200,6 @@ const ReadComponent = ({bno}) => {
 
             <div className="flex justify-center">
                 <div className="relative mb-10 flex w-full flex-wrap items-stretch">
-                    {/*<div className="w-full p-6 text-right font-bold">제목</div>*/}
                     <div className="w-full pb-2 border-b-gray-400 border-b-2 text-2xl font-extrabold">
                         {board.title}
                     </div>
@@ -211,15 +207,17 @@ const ReadComponent = ({bno}) => {
             </div>
 
             <div className="flex justify-center">
-                <div className="relative flex w-full flex-wrap items-stretch">
+                <div className="relative mb-10 flex w-full flex-wrap items-stretch border-b-gray-400 border-b-2">
                     <textarea
-                        className="w-full rounded-r"
+                        className="w-full rounded-r outline-none"
                         rows="30"
                         value={board.content}
                         readOnly={true}
                     ></textarea>
                 </div>
             </div>
+
+            <CommentSectionComponent bno = {bno}></CommentSectionComponent>
 
         </div>
     );

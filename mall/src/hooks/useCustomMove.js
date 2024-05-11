@@ -22,9 +22,7 @@ const getStr = (param, defaultValue) => {
 };
 
 const useCustomMove = () => {
-  console.log(
-    '#################################################################################################### useCustomMove exec start',
-  );
+
   const navigate = useNavigate();
   const [refresh, setRefresh] = useState(false);
 
@@ -35,17 +33,10 @@ const useCustomMove = () => {
   const title = getStr(queryParams.get('title'), '');
   const content = getStr(queryParams.get('content'), '');
   const keyword = getStr(queryParams.get('keyword'), '');
-  console.log('title = ' + title);
-  console.log('content = ' + content);
-  console.log('keyword = ' + keyword);
 
   const queryDefault = createSearchParams({ page, size }).toString();
   const searchDefault = createSearchParams({ title, content, keyword });
-  console.log('searchDefault = ', searchDefault);
 
-  console.log(
-    '#################################################################################################### useCustomMove exec end',
-  );
 
   const moveToList = (pageParam, searchParam) => {
     let queryStr = '';

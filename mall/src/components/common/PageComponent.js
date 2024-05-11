@@ -53,7 +53,7 @@ const PageComponent = ({ serverData, movePage }) => {
       ) : (
         <></>
       )}
-    </div>
+     </div>
   );
 };
 
