@@ -33,6 +33,7 @@ const CommentListComponent = ({commentList, syncCommentList}) => {
                             comment={comment}
                             index={index}
                             handleClickModify={handleClickModify}
+                            syncCommentList={syncCommentList}
                         >
                         </CommentComponent>
                         :

@@ -13,10 +13,6 @@ const ResultModal = ({ title, content, handleModal }) => {
     handleClickAddCancel,
   } = handleModal;
 
-  console.log("current board.bno = " + board.bno);
-  console.log('handleClickCancel = ', handleClickCancel);
-  console.log('handleClickDelete = ', handleClickDelete);
-  console.log('handleClickModify = ', handleClickModify);
   const handleClickType = (title) => {
     if (title === '삭제') handleClickDelete(bno, currentMemberEmail);
 

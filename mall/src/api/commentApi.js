@@ -18,3 +18,9 @@ export const putModifyComment = async (cno, comment, currentEmail) => {
     const res = await jwtAxios.put(`${API_SERVER_HOST}/api/comment/${cno}`, comment, header);
     return res.data;
 }
+
+export const deleteComment = async (cno, currentEmail) => {
+    const header = {headers: {CurrentData: currentEmail}};
+    const res = await jwtAxios.delete(`${API_SERVER_HOST}/api/comment/${cno}`, header);
+    return res.data;
+}
