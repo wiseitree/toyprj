@@ -4,7 +4,6 @@ import okestro.assignment.domain.Comment;
 import okestro.assignment.dto.CommentDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CommentService {
 
@@ -13,4 +12,8 @@ public interface CommentService {
     Comment getCommentDtl(Long cno);
 
     List<CommentDTO> getComments(Long cno);
+
+    void modify(Long cno, CommentDTO commentDTO, String currentEmail);
+
+    void remove(Long cno, String currentEmail);
 }

@@ -8,7 +8,7 @@ const CommentModifyComponent = ({commentList, comment, handleClickCancel}) => {
     const [modifyComment, setModifyComment] = useState({...comment});
 
     const textAreaRef = useRef(null);
-
+    console.log("current comment = ", comment);
 
     const calcCommentLen = () => {
         const totalCommentLen = 1000;

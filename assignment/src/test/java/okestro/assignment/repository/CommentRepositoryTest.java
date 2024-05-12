@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -21,6 +23,7 @@ class CommentRepositoryTest {
 
     @Autowired
     private CommentRepository commentRepository;
+
 
 
     @Test
@@ -74,6 +77,48 @@ class CommentRepositoryTest {
 
         //then
         log.info("commentList: {}", commentList);
+
+    }
+
+    @Test
+    public void update() {
+        //given
+        Long cno = 42L;
+        Long bno = 137L;
+        String content = "commentmapper update test";
+        LocalDateTime updateTime = LocalDateTime.now();
+
+        CommentDTO commentDTO = CommentDTO.builder()
+                .cno(cno)
+                .bno(bno)
+                .content(content)
+                .updateTime(updateTime)
+                .build();
+
+        log.info("commentDTO: {}", commentDTO);
+
+
+        //when
+        commentRepository.update(cno, commentDTO);
+        Comment comment = commentRepository.findByCno(cno).get();
+        log.info("comment: {}", comment);
+
+        //then
+        assertThat(comment.getContent()).isEqualTo(content);
+
+    }
+
+    @Test
+    public void deleteByCno(){
+        //given
+        Long cno = 46L;
+
+        //when
+        commentRepository.deleteByCno(cno);
+
+        //then
+        Optional<Comment> result = commentRepository.findByCno(cno);
+        assertThat(result).isEmpty();
 
     }
 

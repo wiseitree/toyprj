@@ -24,27 +24,68 @@ public class CommentController {
     @PostMapping("/api/comment/")
     public ResponseEntity<?> register(@RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult) {
         HashMap<String, Long> result = new HashMap<>();
+        Long cno = 0L;
+
         log.info("CommentDTO = {}", commentDTO);
 
         if (bindingResult.hasErrors())
             return ResponseEntity.badRequest().body(Map.of("result", "error"));
 
-        Long cno = commentService.register(commentDTO);
+        try {
+            cno = commentService.register(commentDTO);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(Map.of("result", e.getMessage()));
+        }
+
         result.put("result", cno);
 
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/api/comment/{cno}")
-    public Comment getCommentDtl(@PathVariable Long cno){
+    public Comment getCommentDtl(@PathVariable Long cno) {
         Comment commentDtl = commentService.getCommentDtl(cno);
         return commentDtl;
     }
 
     @GetMapping("/api/board/{bno}/comments")
-    public List<CommentDTO> getComments(@PathVariable Long bno){
+    public List<CommentDTO> getComments(@PathVariable Long bno) {
         List<CommentDTO> commentDTOList = commentService.getComments(bno);
         return commentDTOList;
+    }
+
+    @PutMapping("/api/comment/{cno}")
+    public ResponseEntity<?> modify(@PathVariable Long cno, @RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult, @RequestHeader("CurrentData") String currentEmail) {
+        Map<String, String> result = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            result.put("result", "error");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        try {
+            commentService.modify(cno, commentDTO, currentEmail);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("result", e.getMessage()));
+        }
+
+
+        result.put("result", "success");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @DeleteMapping("/api/comment/{cno}")
+    public ResponseEntity<?> remove(@PathVariable Long cno, @RequestHeader("CurrentData") String currentEmail) {
+        Map<String, String> result = new HashMap<>();
+
+        try {
+            commentService.remove(cno, currentEmail);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("result", e.getMessage()));
+        }
+
+        result.put("result", "success");
+        return ResponseEntity.ok().body(result);
     }
 
 }

@@ -22,4 +22,17 @@
         where bno = #{bno}
     </select>
 
+    <update id="update">
+        update comment
+        set content = #{commentDTO.content},
+            update_time = #{commentDTO.updateTime}
+        where cno = #{cno}
+    </update>
+
+    <delete id="deleteByCno">
+        delete
+        from comment
+        where cno = #{cno}
+    </delete>
+
 </mapper>

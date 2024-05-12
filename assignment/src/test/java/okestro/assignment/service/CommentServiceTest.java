@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,7 +29,7 @@ class CommentServiceTest {
     public void register() {
         //given
         Long bno = 33L;
-        String content = "content test";
+        String content = "content update test";
         String email = "user1@aaa.com";
         String nickname = "user1";
 
@@ -48,4 +51,46 @@ class CommentServiceTest {
         assertThat(comment.getNickname()).isEqualTo(nickname);
 
     }
+
+    @Test
+    public void modify(){
+        //given
+        String currentEmail = "user1@aaa.com";
+
+        Long cno = 43L;
+        String content = "content update test";
+        String email = "user1@aaa.com";
+        LocalDateTime updateTime = LocalDateTime.now();
+
+        CommentDTO commentDTO = CommentDTO.builder()
+                .cno(cno)
+                .content(content)
+                .email(email)
+                .updateTime(updateTime)
+                .build();
+
+        //when
+        commentService.modify(cno, commentDTO, currentEmail);
+
+        //then
+        Comment findComment = commentService.getCommentDtl(cno);
+        assertThat(findComment.getContent()).isEqualTo(content);
+
+    }
+
+    @Test
+    public void remove(){
+        //given
+        Long cno = 47L;
+        String currentEmail = "user1@aaa.com";
+
+        //when
+        commentService.remove(cno, currentEmail);
+
+        //then
+        Optional<Comment> result = commentRepository.findByCno(cno);
+        assertThat(result).isEmpty();
+
+    }
+
 }

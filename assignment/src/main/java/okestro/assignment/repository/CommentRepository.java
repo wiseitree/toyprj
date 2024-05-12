@@ -3,6 +3,7 @@ package okestro.assignment.repository;
 
 import lombok.RequiredArgsConstructor;
 import okestro.assignment.domain.Comment;
+import okestro.assignment.dto.CommentDTO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +25,14 @@ public class CommentRepository {
 
     public List<Comment> findCommentList(Long bno){
         return commentMapper.findCommentList(bno);
+    }
+
+    public void update(Long cno, CommentDTO commentDTO){
+        commentMapper.update(cno, commentDTO);
+    }
+
+    public void deleteByCno(Long cno){
+        commentMapper.deleteByCno(cno);
     }
 
 }
