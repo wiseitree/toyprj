@@ -13,3 +13,8 @@ export const getCommentList = async (bno) => {
     return res.data;
 }
 
+export const putModifyComment = async (cno, comment, currentEmail) => {
+    const header = {headers: {CurrentData: currentEmail}};
+    const res = await jwtAxios.put(`${API_SERVER_HOST}/api/comment/${cno}`, comment, header);
+    return res.data;
+}

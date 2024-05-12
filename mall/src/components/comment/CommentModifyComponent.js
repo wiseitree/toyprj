@@ -1,7 +1,8 @@
 import {useSelector} from "react-redux";
 import {useRef, useState} from "react";
+import {putModifyComment} from "../../api/commentApi";
 
-const CommentModifyComponent = ({commentList, comment, handleClickCancel}) => {
+const CommentModifyComponent = ({comment, initModifyCommentIndex, syncCommentList}) => {
     const loginState = useSelector((state) => state.loginSlice);
     const currentMemberEmail = loginState.email;
     const currentMemberNickname = loginState.nickname;
@@ -29,6 +30,17 @@ const CommentModifyComponent = ({commentList, comment, handleClickCancel}) => {
         setModifyComment({...modifyComment});
     }
 
+    const handleClickModifyComment = () => {
+        putModifyComment(modifyComment.cno, modifyComment, currentMemberEmail)
+            .then(() => {
+                initModifyCommentIndex();
+                syncCommentList();
+            })
+            .catch((err) => {
+                console.error("댓글 수정 실패 = ", err);
+            })
+    };
+
 
     return (
         <div className="border border-gray-300 rounded-md w-full p-4 my-4">
@@ -49,13 +61,13 @@ const CommentModifyComponent = ({commentList, comment, handleClickCancel}) => {
             <div className="flex justify-end">
                 <button
                     className="flex px-4 py-2 mr-1 bg-gray-400 text-white rounded-md hover:bg-gray-500"
-                    onClick={() => handleClickCancel()}
+                    onClick={() => initModifyCommentIndex()}
                 >
                     취소
                 </button>
                 <button
                     className="flex px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                    onClick={() => console.log("등록 버튼을 클릭하였습니다. 등록 버튼을 클릭하였습니다. 등록 버튼을 클릭하였습니다. 등록 버튼을 클릭하였습니다. 등록 버튼을 클릭하였습니다. ")}
+                    onClick={() => handleClickModifyComment()}
 
                 >
                     등록

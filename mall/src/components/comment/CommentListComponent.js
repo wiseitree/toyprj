@@ -2,7 +2,7 @@ import {useState} from "react";
 import CommentModifyComponent from "./CommentModifyComponent";
 import CommentComponent from "./CommentComponent";
 
-const CommentListComponent = ({commentList}) => {
+const CommentListComponent = ({commentList, syncCommentList}) => {
     const [modifyCommentIndex, setModifyCommentIndex] = useState('');
 
     const isModifyClicked = (index) => {
@@ -19,7 +19,7 @@ const CommentListComponent = ({commentList}) => {
         setModifyCommentIndex(index);
     };
 
-    const handleClickCancel = () => {
+    const initModifyCommentIndex = () => {
         setModifyCommentIndex('');
     }
 
@@ -37,9 +37,9 @@ const CommentListComponent = ({commentList}) => {
                         </CommentComponent>
                         :
                         <CommentModifyComponent
-                            commentList={commentList}
                             comment={comment}
-                            handleClickCancel={handleClickCancel}
+                            initModifyCommentIndex={initModifyCommentIndex}
+                            syncCommentList={syncCommentList}
                         >
                         </CommentModifyComponent>
                     }
@@ -51,3 +51,4 @@ const CommentListComponent = ({commentList}) => {
 };
 
 export default CommentListComponent;
+

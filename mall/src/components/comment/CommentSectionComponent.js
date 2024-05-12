@@ -30,6 +30,7 @@ const CommentSectionComponent = ({bno}) => {
 
             <CommentListComponent
                 commentList={commentList}
+                syncCommentList={syncCommentList}
             >
             </CommentListComponent>
         </div>
