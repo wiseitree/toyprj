@@ -7,13 +7,19 @@ import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -112,6 +118,23 @@ public class CustomFileUtil {
                 throw new RuntimeException(e.getMessage());
             }
         });
+    }
+
+    public ResponseEntity<Resource> downloadFile(String fileName) throws MalformedURLException {
+//        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
+        UrlResource resource = new UrlResource("file:" + uploadPath + File.separator + fileName);
+
+
+        String resourceFilename = resource.getFilename();
+        String orgFileName = resourceFilename.substring(37);
+        String encodedFileName = UriUtils.encode(orgFileName, StandardCharsets.UTF_8);
+
+        String contentDisposition = "attachment; filename=\"" + encodedFileName + "\"";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(resource);
+
     }
 
 }

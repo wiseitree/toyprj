@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import useCustomMove from '../../hooks/useCustomMove';
 import useCustomLogin from '../../hooks/useCustomLogin';
-import {deleteOne, getOne} from '../../api/boardApi';
+import {deleteOne, downloadOne, getOne} from '../../api/boardApi';
 import {useSelector} from 'react-redux';
 import ResultModal from '../common/ResultModal';
 import FetchingModal from "../common/FetchingModal";
@@ -93,6 +93,40 @@ const ReadComponent = ({bno}) => {
         };
     }, []);
 
+    const handleClickFileName = (fileName) => {
+        downloadOne(fileName)
+            .then((res) => {
+                let downloadFileName = fileName;
+                const blob = new Blob([res.data]);
+                const fileUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = fileUrl;
+
+                const contentDisposition = res.headers['content-disposition'];
+
+                if (contentDisposition){
+                    const decodeContentDisposition = decodeURIComponent(contentDisposition);
+
+                    const matchFileName = decodeContentDisposition.match(/filename="(.+)"/);
+                    if (matchFileName && matchFileName.length === 2)
+                        downloadFileName = matchFileName[1];
+                }
+
+
+                link.setAttribute('download', downloadFileName);
+                document.body.appendChild(link);
+
+                link.click();
+                window.URL.revokeObjectURL(fileUrl);
+                document.body.removeChild(link);
+                // link.remove();
+                })
+            .catch((err) => {
+                console.error("첨부파일 다운로드에 실패하였습니다. error = ", err);
+            })
+
+    }
+
     const getOrgFileName = (fileName) => {
         return fileName.substring(37);
     }
@@ -113,6 +147,8 @@ const ReadComponent = ({bno}) => {
             closeModal('deleted');
         });
     };
+
+
 
     const handleModal = {
         bno: bno,
@@ -191,7 +227,9 @@ const ReadComponent = ({bno}) => {
                     <ul>
                         {fileList.map((fileName, index) => (
                             <li className='hover:underline cursor-pointer'
-                                key={index}>{getOrgFileName(fileName)}</li>
+                                key={index}
+                                onClick={() => handleClickFileName(fileName)}
+                            >{getOrgFileName(fileName)}</li>
                         ))}
                     </ul>
                 </div>
@@ -217,7 +255,7 @@ const ReadComponent = ({bno}) => {
                 </div>
             </div>
 
-            <CommentSectionComponent bno = {bno}></CommentSectionComponent>
+            <CommentSectionComponent bno={bno}></CommentSectionComponent>
 
         </div>
     );

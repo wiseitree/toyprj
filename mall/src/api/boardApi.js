@@ -45,3 +45,13 @@ export const deleteOne = async (bno, currentEmail) => {
   const res = await jwtAxios.delete(`${host}/${bno}`, header);
   return res.data;
 };
+
+export const downloadOne = async (fileName) => {
+  const res = await jwtAxios.get(`${host}/download`, {
+    params:{
+      fileName: fileName,
+    },
+    responseType:'blob',
+  });
+  return res;
+}
