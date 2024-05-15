@@ -93,7 +93,7 @@ const ReadComponent = ({bno}) => {
         };
     }, []);
 
-    const handleClickFileName = (fileName) => {
+    const handleClickDownload = (fileName) => {
         downloadOne(fileName)
             .then((res) => {
                 let downloadFileName = fileName;
@@ -226,10 +226,22 @@ const ReadComponent = ({bno}) => {
                 bg-white border-2 border-neutral-300`}>
                     <ul>
                         {fileList.map((fileName, index) => (
-                            <li className='hover:underline cursor-pointer'
-                                key={index}
-                                onClick={() => handleClickFileName(fileName)}
-                            >{getOrgFileName(fileName)}</li>
+
+                            <li className='flex hover:bg-blue-50 justify-between'
+                                /*key={index}*/
+                                /*onClick={() => handleClickFileName(fileName)}*/
+                            >{/*{getOrgFileName(fileName)}*/}
+                                <div className='mr-2'>
+                                    <span>{getOrgFileName(fileName)}</span>
+                                </div>
+                                <div
+                                    className='hover:underline cursor-pointer'
+                                    onClick={() => handleClickDownload(fileName)}
+                                >
+                                    <span>다운로드</span>
+                                </div>
+                            </li>
+
                         ))}
                     </ul>
                 </div>
