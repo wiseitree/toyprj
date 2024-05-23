@@ -20,6 +20,8 @@ public class Board {
     private LocalDateTime regTime;
     private LocalDateTime updateTime;
     private List<BoardImage> imageList = new ArrayList<>();
+    private long viewCount;
+
 
     public void addImage(BoardImage image){
         image.setOrd(this.imageList.size());
@@ -56,11 +58,10 @@ public class Board {
                 .writer(board.writer)
                 .regTime(board.regTime)
                 .updateTime(board.updateTime)
+                .viewCount(board.viewCount)
                 .build();
 
         return boardDTO;
     }
-
-
 
 }

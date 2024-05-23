@@ -45,7 +45,7 @@ class BoardRepositoryTest {
     }
 
     @Test
-    public void insert(){
+    public void insert() {
         //given
         String email = "user1@aaa.com";
 
@@ -78,7 +78,7 @@ class BoardRepositoryTest {
     @Test
     public void read() {
         //given
-        Long bno = 30L;
+        Long bno = 142L;
 
         //when
         Board board = boardRepository.findByBno(bno).get();
@@ -89,6 +89,22 @@ class BoardRepositoryTest {
         //log
         log.info("board = {}", board);
         log.info("board.getMember = {}", board.getMember());
+
+    }
+
+    @Test
+    public void updateViewCount() {
+        //given
+        Long bno = 142L;
+        Board board = boardRepository.findByBno(bno).get();
+        long viewCount = board.getViewCount();
+        long updateViewCount = viewCount + 1;
+
+        //when
+        boardRepository.updateViewCount(bno, updateViewCount);
+
+        //then
+        log.info("board = {}", board);
 
     }
 
@@ -153,7 +169,7 @@ class BoardRepositoryTest {
     @Test
     public void findBoardList() {
         //given
-        int offset = 0;
+        int offset = 10;
         int limit = 10;
 
         BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()

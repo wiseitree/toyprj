@@ -43,8 +43,7 @@ const requestFail = (err) => {
 
 //before return response
 const beforeRes = async (res) => {
-  const data = res.data;
-
+  const data = res.data
   if (data && data.error === 'ERROR_ACCESS_TOKEN') {
     const memberCookieValue = getCookie('member');
 

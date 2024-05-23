@@ -1,13 +1,19 @@
 package okestro.assignment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.Cookie;
 import okestro.assignment.dto.BoardDTO;
 import okestro.assignment.dto.BoardSearchDTO;
 import okestro.assignment.dto.page.PageRequestDTO;
 import okestro.assignment.dto.page.PageResponseDTO;
 
+import java.util.Set;
+
 public interface BoardService {
 
     Long register(BoardDTO boardDTO);
+
+    BoardDTO getBoard(Long bno, Cookie boardViewCount) throws JsonProcessingException;
 
     BoardDTO getBoardDtl(Long bno);
 

@@ -18,6 +18,8 @@ public interface BoardMapper {
 
     Optional<Board> findByBno(Long bno);
 
+    void updateViewCount(@Param("bno") Long bno, @Param("updateViewCount") long updateViewCount);
+
     void update(@Param("bno") Long bno, @Param("boardDTO") BoardDTO boardDTO);
 
     void deleteByBno(Long bno);

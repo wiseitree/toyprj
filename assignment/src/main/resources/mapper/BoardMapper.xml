@@ -25,6 +25,7 @@
         <result property="writer" column="writer"/>
         <result property="regTime" column="reg_time"/>
         <result property="updateTime" column="update_time"/>
+        <result property="viewCount" column="view_count"/>
         <association property="member" column="email" resultMap="memberMap"/>
         <collection property="imageList" ofType="BoardImage" resultMap="boardImageMap"/>
     </resultMap>
@@ -43,12 +44,18 @@
     </resultMap>
 
     <select id="findByBno" resultMap="boardMap">
-        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname, bi.file_name, bi.ord
+        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, b.view_count, m.nickname, bi.file_name, bi.ord
         from board b
         left join member m on b.email = m.email
         left join board_image bi on b.bno = bi.board_bno
         where b.bno = #{bno}
     </select>
+
+    <update id="updateViewCount">
+        update board
+        set view_count = #{updateViewCount}
+        where bno = #{bno}
+    </update>
 
     <update id="update">
         update board
@@ -71,7 +78,7 @@
     </delete>
 
     <select id="findBoardList" resultMap="boardMap">
-        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, m.nickname, bi.file_name, bi.ord
+        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, b.view_count, m.nickname, bi.file_name, bi.ord
         from board b
         left join member m on b.email = m.email
         left join board_image bi on b.bno = bi.board_bno and bi.ord = 0

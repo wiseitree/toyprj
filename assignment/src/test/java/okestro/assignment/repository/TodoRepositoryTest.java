@@ -24,7 +24,7 @@ class TodoRepositoryTest {
     @Autowired
     private TodoRepository todoRepository;
 
-    @BeforeEach
+    /*@BeforeEach
     void createDummy() {
         for (int i = 1; i <= 38; i++) {
 
@@ -36,7 +36,7 @@ class TodoRepositoryTest {
 
             todoRepository.save(todo);
         }
-    }
+    }*/
 
 
     @Test

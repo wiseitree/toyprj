@@ -6,6 +6,8 @@ import {useSelector} from 'react-redux';
 import ResultModal from '../common/ResultModal';
 import FetchingModal from "../common/FetchingModal";
 import CommentSectionComponent from "../comment/CommentSectionComponent";
+import {getCookie, setViewCountCookie} from "../../util/cookieUtil";
+
 
 const initState = {
     bno: 0,
@@ -16,6 +18,7 @@ const initState = {
     updateTime: null,
     email: '',
     uploadFileNames: [],
+    viewCount: '',
 };
 
 const modalState = {
@@ -41,6 +44,7 @@ const ReadComponent = ({bno}) => {
     const fileListRef = useRef(null);
     const fileCountRef = useRef(null);
 
+
     const isAdmin = () => {
         let admin = false;
         if (currentMemberRole !== undefined && currentMemberRole.includes('ADMIN')) admin = true;
@@ -60,26 +64,31 @@ const ReadComponent = ({bno}) => {
 
     useEffect(() => {
         setFetching(true);
+        const boardViewCountCookie = getCookie('boardViewCount') || setViewCountCookie('boardViewCount', JSON.stringify([]));
+        ;
 
         getOne(bno)
             .then((data) => {
-
                 setBoard(data);
                 setBoardOwnerEmail(data.email);
                 setFileList(data.uploadFileNames);
                 setFetching(false)
 
+                const boardViewCountSet = new Set(boardViewCountCookie);
+                boardViewCountSet.add(parseInt(bno));
+                const boardViewCountArr = Array.from(boardViewCountSet);
+                setViewCountCookie('boardViewCount', JSON.stringify(boardViewCountArr));
             })
             .catch((err) => {
                     exceptionHandle(err)
                 }
             );
     }, [bno]);
-    
+
     useEffect(() => {
         // Add event listener to detect clicks outside file list area
         const handleClickOutside = (event) => {
-            if (!fileListRef.current.contains(event.target) && !fileCountRef.current.contains(event.target)) {
+            if (fileListRef.current && !fileListRef.current.contains(event.target) && !fileCountRef.current.contains(event.target)) {
                 setShowFileList(false);
             }
         };
@@ -104,7 +113,7 @@ const ReadComponent = ({bno}) => {
 
                 const contentDisposition = res.headers['content-disposition'];
 
-                if (contentDisposition){
+                if (contentDisposition) {
                     const decodeContentDisposition = decodeURIComponent(contentDisposition);
 
                     const matchFileName = decodeContentDisposition.match(/filename="(.+)"/);
@@ -120,7 +129,7 @@ const ReadComponent = ({bno}) => {
                 window.URL.revokeObjectURL(fileUrl);
                 document.body.removeChild(link);
                 // link.remove();
-                })
+            })
             .catch((err) => {
                 console.error("첨부파일 다운로드에 실패하였습니다. error = ", err);
             })
@@ -149,7 +158,6 @@ const ReadComponent = ({bno}) => {
     };
 
 
-
     const handleModal = {
         bno: bno,
         board: board,
@@ -166,16 +174,14 @@ const ReadComponent = ({bno}) => {
 
     return (
         <div className="border-2 border-sky-200 mt-10 m-2 p-4 ">
-            {fetching ? <FetchingModal/> : <></>}
+            {fetching && <FetchingModal/>}
 
-            {result ? (
+            {result && (
                 <ResultModal
                     title={modal.title}
                     content={modal.content}
                     handleModal={handleModal}
                 ></ResultModal>
-            ) : (
-                <></>
             )}
 
             {/* buttons..........start */}
@@ -205,58 +211,60 @@ const ReadComponent = ({bno}) => {
                 </button>
             </div>
 
-            {/* 글 정보 */}
-            <div className="flex justify-end mt-4">
-                <div className="mr-4">글번호: {board.bno} </div>
-                <div className="mr-4">작성자: {board.writer} </div>
-                <div>등록시간: {board.regTime}</div>
+
+            <div className="mb-2 flex-coll w-full flex-wrap items-stretch">
+                <div className="w-full mb-2 text-2xl font-extrabold">
+                    {board.title}
+                </div>
+                <div className="flex justify-start text-lg">
+                    <div>{board.writer} </div>
+                </div>
+                <div className="flex pb-5 justify-start text-sm text-neutral-400 border-b-gray-400 border-b-2">
+                    <div className="mr-2">{board.regTime} </div>
+                    <div>조회 {board.viewCount} </div>
+                </div>
             </div>
 
-            <div className="flex relative justify-end">
-                <div className="flex justify-end pb-4" ref={fileCountRef}>
-                    첨부파일
-                    <span className="text-red-600 hover:cursor-pointer"
-                          onClick={() => setShowFileList(!showFileList)}
-                    >
+
+            <div className="flex-col">
+                <div className="flex relative justify-end">
+                    <div className="flex justify-end pb-4" ref={fileCountRef}>
+                        첨부파일
+                        <span className="text-red-600 hover:cursor-pointer"
+                              onClick={() => setShowFileList(!showFileList)}
+                        >
                         ({fileList.length})
-                    </span>
-                </div>
-
-                <div ref={fileListRef} className={`flex absolute ${!showFileList ? 'hidden' : ''} top-full overflow-y-auto z-10
-                bg-white border-2 border-neutral-300`}>
-                    <ul>
-                        {fileList.map((fileName, index) => (
-
-                            <li className='flex hover:bg-blue-50 justify-between'
-                                /*key={index}*/
-                                /*onClick={() => handleClickFileName(fileName)}*/
-                            >{/*{getOrgFileName(fileName)}*/}
-                                <div className='mr-2'>
-                                    <span>{getOrgFileName(fileName)}</span>
-                                </div>
-                                <div
-                                    className='hover:underline cursor-pointer'
-                                    onClick={() => handleClickDownload(fileName)}
-                                >
-                                    <span>다운로드</span>
-                                </div>
-                            </li>
-
-                        ))}
-                    </ul>
-                </div>
-            </div>
-
-
-            <div className="flex justify-center">
-                <div className="relative mb-10 flex w-full flex-wrap items-stretch">
-                    <div className="w-full pb-2 border-b-gray-400 border-b-2 text-2xl font-extrabold">
-                        {board.title}
+                        </span>
                     </div>
-                </div>
-            </div>
 
-            <div className="flex justify-center">
+                    {showFileList && (
+                        <div ref={fileListRef} className={`flex absolute top-full overflow-y-auto z-10
+                bg-white border-2 border-neutral-300`}>
+                            <ul>
+                                {fileList.map((fileName, index) => (
+
+                                    <li className='flex hover:bg-blue-50 justify-between'
+                                        key={index}
+                                    >
+                                        <div className='mr-2'>
+                                            <span>{getOrgFileName(fileName)}</span>
+                                        </div>
+                                        <div
+                                            className='hover:underline cursor-pointer'
+                                            onClick={() => handleClickDownload(fileName)}
+                                        >
+                                            <span>다운로드</span>
+                                        </div>
+                                    </li>
+
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                </div>
+
+
                 <div className="relative mb-10 flex w-full flex-wrap items-stretch border-b-gray-400 border-b-2">
                     <textarea
                         className="w-full rounded-r outline-none"

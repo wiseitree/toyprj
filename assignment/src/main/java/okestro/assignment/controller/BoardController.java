@@ -1,6 +1,12 @@
 package okestro.assignment.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +27,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,18 +42,18 @@ public class BoardController {
     private final BoardService boardService;
     private final BoardRepository boardRepository;
 
+    private final ObjectMapper objectMapper;
+
     @GetMapping("/{bno}")
-    public BoardDTO getBoardDtl(@PathVariable Long bno) {
-        return boardService.getBoardDtl(bno);
+    public BoardDTO getBoardDtl(@PathVariable Long bno, @CookieValue(name = "boardViewCount") Cookie boardViewCount) throws JsonProcessingException {
+
+        return boardService.getBoard(bno, boardViewCount);
     }
 
     /*@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")*/
     @PreAuthorize("permitAll()")
     @GetMapping("/list")
     public PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO, BoardSearchDTO boardSearchDTO) {
-        log.info("#################### BoardController - /api/board/list");
-        log.info("pageRequestDTO: {}", pageRequestDTO);
-        log.info("boardSearchDTO: {}", boardSearchDTO);
         PageResponseDTO<BoardDTO> pageResponseDTO = boardService.getPageResponse(pageRequestDTO, boardSearchDTO);
         return pageResponseDTO;
     }
@@ -61,11 +67,9 @@ public class BoardController {
             return ResponseEntity.badRequest().body(Map.of("result", "error"));
         }
 
-        log.info("#####BoardController - /api/board/register - BoardDTO {}", boardDTO);
         List<MultipartFile> files = boardDTO.getFiles();
         List<String> uploadFileNames = fileUtil.saveFiles(files);
         boardDTO.setUploadFileNames(uploadFileNames);
-        log.info("#####BoardController - /api/board/register - uploadFileNames {}", uploadFileNames);
 
         Long bno = boardService.register(boardDTO);
         result.put("result", bno);

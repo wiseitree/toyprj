@@ -4,6 +4,7 @@ import PageComponent from '../common/PageComponent';
 import useCustomLogin from '../../hooks/useCustomLogin';
 import {getList} from '../../api/boardApi';
 import FetchingModal from "../common/FetchingModal";
+import {getCookie} from "../../util/cookieUtil";
 
 const initState = {
     dtoList: [],
@@ -26,6 +27,7 @@ const searchState = {
 
 const ListComponent = () => {
     console.log('##### ListComponent start #####');
+    const boardViewCountCookie = getCookie('boardViewCount');
     const {exceptionHandle} = useCustomLogin();
     const {
         page,
@@ -42,25 +44,14 @@ const ListComponent = () => {
     const [searchParam, setSearchParam] = useState(searchState);
     const [fetching, setFetching] = useState(false);
 
-    console.log('currentSearchParam.title - ' + searchParam.title);
-    console.log('currentSearchParam.content - ' + searchParam.content);
-    console.log('currentSearchParam.keyword - ' + searchParam.keyword);
-    console.log('current-title = ' + title);
-    console.log('current-content = ' + content);
-    console.log('current-keyword = ' + keyword);
-    console.log('##### ListComponent end #####');
-
     useEffect(() => {
         setFetching(true);
-        console.log("#################################### useEffect before getList ####################################");
         getList({page, size}, {title, content, keyword})
             .then((data) => {
                 setServerData(data);
-                console.log("current serverdata = ", data);
                 setFetching(false);
             })
             .catch((err) => {
-                console.log("#################################### useEffect err ####################################");
                 exceptionHandle(err)
             });
     }, [page, size, title, content, keyword, refresh]);
@@ -74,9 +65,7 @@ const ListComponent = () => {
             searchParam.title = 'title';
             searchParam.content = 'content';
             // setSearchParam({ ...searchParam, title: 'title', content: 'content' }); <-- 얘는 위에 두줄 주석처리하면 써도 됌
-            console.log(
-                "##### if searchParam.title == '' && searchParam.content == ''",
-            );
+
         }
 
         // setSearchParam({ ...searchParam, title, content, keyword }); <-- 여기서 이렇게 쓰면 안돼고
@@ -109,7 +98,6 @@ const ListComponent = () => {
 
     const handleSearchKeywordChange = (e) => {
         searchParam.keyword = e.target.value;
-        console.log('handleSearchKeywordChange - searchParam', searchParam);
         setSearchParam({...searchParam});
     };
 
@@ -138,42 +126,46 @@ const ListComponent = () => {
     return (
         <div className="border-2 border-blue-100 mt-10 mr-2 ml-2">
             {fetching ? <FetchingModal/> : <></>}
-            <div className="flex mx-auto justify-center p-10  font-extrab
-      old text-2xl">
+            <div className="flex mx-auto px-10 py-5 font-extrabold text-2xl text-center">
                 <div className="w-1/12">번호</div>
-                <div className="w-6/12 pl-2">제목</div>
-                <div className="w-2/12 ">작성자</div>
-                <div className="w-3/12 pl-2">등록일</div>
+                <div className="w-6/12">제목</div>
+                <div className="w-2/12">작성자</div>
+                <div className="w-2/12">등록일</div>
+                <div className="w-1/12">조회</div>
             </div>
-            <div className="flex flex-wrap mx-auto justify-center p-6">
+            <div className="flex flex-wrap px-10 py-5 text-center">
                 {serverData.dtoList.map((board) => (
                     <div
                         key={board.bno}
-                        className="w-full p-2 m-2 rounded shadow-md hover:bg-blue-200"
+                        className="w-full rounded shadow-md hover:bg-blue-200 py-5"
                         onClick={() => moveToRead(board.bno)} //이벤트 처리 추가
                     >
-                        <div className="flex">
-                            <div className="font-light text-xl p-2 w-1/12">
+                        <div className="flex  items-center">
+                            <div className="font-light text-xl  w-1/12">
                                 {board.bno}
                             </div>
-                            <div className="flex items-center text-xl m-1 p-2 w-6/12 font-medium">
+                            <div className="flex text-xl  w-6/12 font-medium text-wrap">
                                 {renderTitle(board)}
-                                {board.uploadFileNames.length > 0 ?
+                                {
+                                    board.uploadFileNames.length ?
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5"
-                                         stroke="currentColor" className="w-6 h-6 ml-2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                         strokeWidth="1.5"
+                                         stroke="currentColor" className="w-6 h-auto ml-2">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
                                               d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/>
                                     </svg>
-                                    :
-                                    <></>
+                                        :
+                                        <></>
                                 }
                             </div>
-                            <div className="text-xl m-1 p-2 w-2/12 font-medium">
+                            <div className="text-xl  w-2/12 font-medium">
                                 {board.writer}
                             </div>
-                            <div className="text-xl m-1 p-2 w-3/12 font-medium">
+                            <div className="text-xl  w-2/12 font-medium">
                                 {board.regTime}
+                            </div>
+                            <div className="text-xl  w-1/12 font-medium">
+                                {board.viewCount}
                             </div>
                         </div>
                     </div>

@@ -27,7 +27,7 @@ const CommentListComponent = ({commentList, syncCommentList}) => {
     return (
         <ul className="mt-14">
             {commentList.map((comment, index) => (
-                <div>
+                <div key={index}>
                     {!isModifyClicked(index) ?
                         <CommentComponent
                             comment={comment}

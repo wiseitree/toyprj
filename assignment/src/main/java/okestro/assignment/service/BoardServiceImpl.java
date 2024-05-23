@@ -1,5 +1,9 @@
 package okestro.assignment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okestro.assignment.domain.Board;
@@ -17,11 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -31,11 +34,10 @@ public class BoardServiceImpl implements BoardService {
 
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
-
+    private final ObjectMapper objectMapper;
 
     @Override
     public Long register(BoardDTO boardDTO) {
-        log.info("#################### BoardServiceImpl - register");
         Member member = memberRepository.findByEmail(boardDTO.getEmail()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
         Board board = dtoToEntity(boardDTO, member);
@@ -50,6 +52,27 @@ public class BoardServiceImpl implements BoardService {
         Long bno = savedBoard.getBno();
 
         return bno;
+    }
+
+    @Override
+    public BoardDTO getBoard(Long bno, Cookie boardViewCount) throws JsonProcessingException {
+        BoardDTO boardDTO = getBoardDtl(bno);
+        updateViewCount(bno, boardViewCount);
+
+        return boardDTO;
+    }
+
+    private void updateViewCount(Long bno, Cookie boardViewCount) throws JsonProcessingException {
+        String decodeValue = URLDecoder.decode(boardViewCount.getValue(), StandardCharsets.UTF_8);
+        Set<Long> bnoSet = objectMapper.readValue(decodeValue, new TypeReference<Set<Long>>() {
+        });
+
+        Board board = boardRepository.findByBno(bno)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시판입니다."));
+
+        long viewCount = board.getViewCount();
+        long updateViewCount = viewCount + 1;
+        boardRepository.updateViewCount(bno, updateViewCount);
     }
 
     @Override

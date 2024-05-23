@@ -32,11 +32,6 @@ public class CustomSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("------security config-----");
 
-//        http.authorizeHttpRequests((authorizeRequests) ->
-//                authorizeRequests
-//                        .requestMatchers("/api/member/**").permitAll()
-//                        .anyRequest().authenticated()
-//        );
 
         http.cors(httpSecurityCorsConfigurer -> {
             httpSecurityCorsConfigurer.

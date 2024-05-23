@@ -25,6 +25,10 @@ public class BoardRepository {
         return boardMapper.findByBno(bno);
     }
 
+    public void updateViewCount(Long bno, long updateViewCount){
+        boardMapper.updateViewCount(bno, updateViewCount);
+    }
+
     public void update(Long bno, BoardDTO boardDTO){
         boardMapper.update(bno, boardDTO);
     }
@@ -48,4 +52,6 @@ public class BoardRepository {
     public int getTotalCount(BoardSearchDTO boardSearchDTO){
         return boardMapper.getTotalCount(boardSearchDTO);
     }
+
+
 }
