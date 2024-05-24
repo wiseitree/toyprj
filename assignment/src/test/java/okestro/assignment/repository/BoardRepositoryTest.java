@@ -78,7 +78,7 @@ class BoardRepositoryTest {
     @Test
     public void read() {
         //given
-        Long bno = 142L;
+        Long bno = 136L;
 
         //when
         Board board = boardRepository.findByBno(bno).get();
@@ -169,13 +169,10 @@ class BoardRepositoryTest {
     @Test
     public void findBoardList() {
         //given
-        int offset = 10;
+        int offset = 0;
         int limit = 10;
 
         BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()
-                .title("title")
-                .content("content")
-                .keyword("test")
                 .build();
 
 
@@ -208,6 +205,25 @@ class BoardRepositoryTest {
 
         int totalCount = boardRepository.getTotalCount(boardSearchDTO);
         log.info("#################### totalCount = {}", totalCount);
+
+    }
+
+    @Test
+    public void temp(){
+        //given
+        int offset = 10;
+        int limit = 10;
+
+        BoardSearchDTO boardSearchDTO = BoardSearchDTO.builder()
+                .title("title")
+                .content("content")
+                .keyword("test")
+                .build();
+
+        //when
+        boardRepository.findBoardList(offset, limit, boardSearchDTO);
+
+        //then
 
     }
 

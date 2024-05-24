@@ -34,9 +34,10 @@ public class BoardDTO {
     private List<MultipartFile> files = new ArrayList<>();
     private List<String> uploadFileNames = new ArrayList<>();
     private long viewCount;
+    private int commentCount;
 
     @Builder
-    public BoardDTO(Long bno, String title, String content, String email, String writer, LocalDateTime regTime, LocalDateTime updateTime, long viewCount) {
+    public BoardDTO(Long bno, String title, String content, String email, String writer, LocalDateTime regTime, LocalDateTime updateTime, long viewCount, int commentCount) {
         this.bno = bno;
         this.title = title;
         this.content = content;
@@ -45,6 +46,7 @@ public class BoardDTO {
         this.regTime = regTime;
         this.updateTime = updateTime;
         this.viewCount = viewCount;
+        this.commentCount = commentCount;
     }
 
     public Board toEntity(BoardDTO boardDTO, Member member){

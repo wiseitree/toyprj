@@ -157,6 +157,9 @@ const ListComponent = () => {
                                         :
                                         <></>
                                 }
+                                {
+                                    board.commentCount ? <span className="text-red-500">[{board.commentCount}]</span> : <></>
+                                }
                             </div>
                             <div className="text-xl  w-2/12 font-medium">
                                 {board.writer}

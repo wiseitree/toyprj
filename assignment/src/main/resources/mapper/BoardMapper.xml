@@ -26,6 +26,7 @@
         <result property="regTime" column="reg_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="viewCount" column="view_count"/>
+        <result property="commentCount" column="comment_count"/>
         <association property="member" column="email" resultMap="memberMap"/>
         <collection property="imageList" ofType="BoardImage" resultMap="boardImageMap"/>
     </resultMap>
@@ -78,10 +79,11 @@
     </delete>
 
     <select id="findBoardList" resultMap="boardMap">
-        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, b.view_count, m.nickname, bi.file_name, bi.ord
+        select b.bno, b.title, b.content, b.email, b.writer, b.reg_time, b.update_time, b.view_count, m.nickname, bi.file_name, bi.ord, count(c.cno) as comment_count
         from board b
         left join member m on b.email = m.email
         left join board_image bi on b.bno = bi.board_bno and bi.ord = 0
+        left join comment c on b.bno = c.bno
         <where>
             <if test="boardSearchDTO.title != null and boardSearchDTO.title != ''">
                 or b.title like concat('%', #{boardSearchDTO.keyword}, '%')
@@ -90,6 +92,7 @@
                 or b.content like concat('%', #{boardSearchDTO.keyword}, '%')
             </if>
         </where>
+        group by b.bno
         order by b.reg_time desc , b.bno desc
         limit #{offset}, #{limit}
     </select>

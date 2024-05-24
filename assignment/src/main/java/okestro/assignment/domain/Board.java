@@ -21,6 +21,7 @@ public class Board {
     private LocalDateTime updateTime;
     private List<BoardImage> imageList = new ArrayList<>();
     private long viewCount;
+    private int commentCount;
 
 
     public void addImage(BoardImage image){
@@ -59,6 +60,7 @@ public class Board {
                 .regTime(board.regTime)
                 .updateTime(board.updateTime)
                 .viewCount(board.viewCount)
+                .commentCount(board.commentCount)
                 .build();
 
         return boardDTO;

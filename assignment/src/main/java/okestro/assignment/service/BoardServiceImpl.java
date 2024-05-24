@@ -67,6 +67,9 @@ public class BoardServiceImpl implements BoardService {
         Set<Long> bnoSet = objectMapper.readValue(decodeValue, new TypeReference<Set<Long>>() {
         });
 
+        if (bnoSet.contains(bno))
+            return;
+
         Board board = boardRepository.findByBno(bno)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시판입니다."));
 
