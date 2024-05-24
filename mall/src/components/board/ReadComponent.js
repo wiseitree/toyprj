@@ -212,12 +212,12 @@ const ReadComponent = ({bno}) => {
             </div>
 
 
-            <div className="mb-2 flex-coll w-full flex-wrap items-stretch">
+            <div className="mb-2 flex-col w-full flex-wrap items-stretch">
                 <div className="w-full mb-2 text-2xl font-extrabold">
                     {board.title}
                 </div>
-                <div className="flex justify-start text-lg">
-                    <div>{board.writer} </div>
+                <div className="text-lg">
+                    {board.writer}
                 </div>
                 <div className="flex pb-5 justify-start text-sm text-neutral-400 border-b-gray-400 border-b-2">
                     <div className="mr-2">{board.regTime} </div>

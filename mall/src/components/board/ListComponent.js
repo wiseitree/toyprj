@@ -140,26 +140,28 @@ const ListComponent = () => {
                         className="w-full rounded shadow-md hover:bg-blue-200 py-5"
                         onClick={() => moveToRead(board.bno)} //이벤트 처리 추가
                     >
-                        <div className="flex  items-center">
-                            <div className="font-light text-xl  w-1/12">
+                        <div className="flex items-center">
+                            <div className="font-light text-xl  w-1/12 ">
                                 {board.bno}
                             </div>
-                            <div className="flex text-xl  w-6/12 font-medium text-wrap">
-                                {renderTitle(board)}
+                            <div className="flex-none w-6/12 font-medium text-wrap">
+                                <p className="break-words text-left">{board.title}
                                 {
                                     board.uploadFileNames.length ?
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         strokeWidth="1.5"
-                                         stroke="currentColor" className="w-6 h-auto ml-2">
-                                        <path strokeLinecap="round" strokeLinejoin="round"
-                                              d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/>
-                                    </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             strokeWidth="1.5"
+                                             stroke="currentColor" className="w-6 h-auto ml-2 inline">
+                                            <path strokeLinecap="round" strokeLinejoin="round"
+                                                  d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/>
+                                        </svg>
                                         :
                                         <></>
                                 }
                                 {
-                                    board.commentCount ? <span className="text-red-500">[{board.commentCount}]</span> : <></>
+                                    board.commentCount ?
+                                        <span className="text-red-500">[{board.commentCount}]</span> : <></>
                                 }
+                                </p>
                             </div>
                             <div className="text-xl  w-2/12 font-medium">
                                 {board.writer}
@@ -167,7 +169,7 @@ const ListComponent = () => {
                             <div className="text-xl  w-2/12 font-medium">
                                 {board.regTime}
                             </div>
-                            <div className="text-xl  w-1/12 font-medium">
+                            <div className="text-xl  w-1/12 font-medium items-center">
                                 {board.viewCount}
                             </div>
                         </div>

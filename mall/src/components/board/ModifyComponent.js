@@ -12,6 +12,7 @@ const initState = {
     content: '',
     email: '',
     uploadFileNames: [],
+    viewCount: '',
 };
 
 const modalState = {
@@ -237,19 +238,26 @@ const ModifyComponent = ({bno}) => {
                 </button>
             </div>
 
-            {/*<div className="flex justify-center mt-10">*/}
-            {/*  <div className="relative mb-4 flex w-full flex-wrap items-stretch">*/}
-            {/*    <div className="w-1/5 p-6 text-right font-bold">번호</div>*/}
-            {/*    <div className="w-4/5 p-6 rounded-r border border-solid shadow-md bg-gray-100">*/}
-            {/*      {board.bno}*/}
-            {/*    </div>*/}
-            {/*  </div>*/}
-            {/*</div>*/}
-
-            <div className="flex justify-end mt-4">
-                <div className="mr-4">글번호: {board.bno} </div>
-                <div className="mr-4">작성자: {board.writer} </div>
-                <div>등록시간: {board.regTime}</div>
+            <div className="mb-2 flex-col">
+                <div className="relative mb-2 flex w-full flex-wrap items-stretch">
+                    <input
+                        className="w-full text-2xl font-extrabold"
+                        name="title"
+                        type={'text'}
+                        value={board.title}
+                        onChange={handleChangeBoard}
+                    ></input>
+                    <div className="absolute bottom-0 right-0 text-gray-500">
+                        {calcContentLen('title')}
+                    </div>
+                </div>
+                <div className="text-lg">
+                    {board.writer}
+                </div>
+                <div className="flex pb-5 justify-start text-sm text-neutral-400 border-b-gray-400 border-b-2">
+                    <div className="mr-2">{board.regTime} </div>
+                    <div>조회 {board.viewCount} </div>
+                </div>
             </div>
 
             <div className="flex relative justify-end">
@@ -285,23 +293,6 @@ const ModifyComponent = ({bno}) => {
                         ))}
                     </ul>
                 </div>
-
-            </div>
-
-
-            <div className="flex justify-center">
-                <div className="relative mb-10 flex w-full flex-wrap items-stretch">
-                    <input
-                        className="w-full pb-2 border-b-gray-400 border-b-2 text-2xl font-extrabold"
-                        name="title"
-                        type={'text'}
-                        value={board.title}
-                        onChange={handleChangeBoard}
-                    ></input>
-                    <div className="absolute bottom-0 right-0 text-gray-500">
-                        {calcContentLen('title')}
-                    </div>
-                </div>
             </div>
 
             <div className="flex justify-center">
@@ -313,6 +304,7 @@ const ModifyComponent = ({bno}) => {
                         value={board.content}
                         onChange={handleChangeBoard}
                         rows="30"
+                        autoFocus={true}
                     ></textarea>
                     <div className="absolute bottom-0 right-0 text-gray-500">
                         {calcContentLen('content')}
