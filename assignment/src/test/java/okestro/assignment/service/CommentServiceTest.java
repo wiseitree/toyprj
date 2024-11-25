@@ -93,4 +93,26 @@ class CommentServiceTest {
 
     }
 
+    @Test void temp(){
+        String currentEmail = "user1@aaa.com";
+        log.info("currentEmail = {}",currentEmail );
+
+        String tempStr = null;
+        upload("test", "");
+
+    }
+
+    public void upload(String name, String path){
+        log.info("name = {}",name);
+        log.info("path = {}",path);
+            System.out.println("path is exist");
+
+        if (path == null || path.isEmpty()) {}
+            System.out.println("path is null");
+
+        String currentPath = "ticketNo" + "/" + path;
+        log.info("currentPath = {}",currentPath);
+    }
+
+
 }
